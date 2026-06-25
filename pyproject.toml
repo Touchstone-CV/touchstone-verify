@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "touchstone-verify"
+version = "0.1.0"
+description = "Independently verify a Touchstone disclosure — zero dependencies, pure Python."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Touchstone" }]
+keywords = ["touchstone", "audit-log", "verifier", "ed25519", "tamper-evident", "provenance"]
+classifiers = [
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Security :: Cryptography",
+]
+
+[project.urls]
+Homepage = "https://touchstone.cv"
+Source = "https://github.com/Touchstone-CV/touchstone-verify"
+
+[project.scripts]
+touchstone-verify = "touchstone_verify.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

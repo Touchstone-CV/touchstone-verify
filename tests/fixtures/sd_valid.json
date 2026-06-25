@@ -1,0 +1,147 @@
+{
+    "format": "touchstone-disclosure/1",
+    "recorder": {
+        "public_id": "rec_01kvz9vjsfpvz57172ssbgaqw6",
+        "subject_sub": "conf-e9c6e0f1",
+        "signing_pubkey": "FvqMyR8PlL4Y2KzApJrVfxQw/L+tc4l7yVszCUmEBFg=",
+        "signing_keys": [
+            {
+                "pubkey": "FvqMyR8PlL4Y2KzApJrVfxQw/L+tc4l7yVszCUmEBFg=",
+                "from_seq": 0
+            }
+        ],
+        "trust_tier": "evidence"
+    },
+    "server_pubkey": null,
+    "nostr": null,
+    "entries": [
+        {
+            "seq": 0,
+            "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "entry_hash": "3a0625df3d8d3a657f84e2176635415a86d09498009276c6e20cdcc631d5f6ba",
+            "event_type": "genesis",
+            "payload_hash": "4967e072dc28ae6e9487a08fa462e1ca177416916accfa8d8c0502dd6973a833",
+            "actor_sub": "conf-e9c6e0f1",
+            "counterparty_sub": null,
+            "counterparty_sig": null,
+            "counterparty_pubkey": null,
+            "counterparty_grade": null,
+            "actor_sig": "EmPiZ2woajPOgRwbhrMz5HpkXhuxA5+zBT4zktwRA5Ll9zTB4R9n7j5haO557f50/cvXdWCmmFj0Ppbs66BTAQ==",
+            "client_ts": null,
+            "server_ts": "2026-06-25T11:50:14Z",
+            "body_enc": "{\"type\":\"genesis\",\"subject_sub\":\"conf-e9c6e0f1\",\"signing_pubkey\":\"FvqMyR8PlL4Y2KzApJrVfxQw/L+tc4l7yVszCUmEBFg=\"}",
+            "redacted": false,
+            "merkle_proof": [
+                {
+                    "hash": "caa8173cc9d9405249f56b45b9165aff9959c7514c53250705e9323324f9537e",
+                    "side": "right"
+                }
+            ],
+            "checkpoint_id": 27
+        },
+        {
+            "seq": 1,
+            "prev_hash": "3a0625df3d8d3a657f84e2176635415a86d09498009276c6e20cdcc631d5f6ba",
+            "entry_hash": "2615110ef164ab00b540010f1f377e3b80991b219c468c210bb2baf75c2c828f",
+            "event_type": "tool_call",
+            "payload_hash": "a720c94ce09af4bcadd991beeb2b42853765e62e170e873694e2fd9cde898a8b",
+            "actor_sub": "conf-e9c6e0f1",
+            "counterparty_sub": null,
+            "counterparty_sig": null,
+            "counterparty_pubkey": null,
+            "counterparty_grade": null,
+            "actor_sig": "Lv8bTe03pGZKB077YvHQ3Uydk1vGBYjg0EjUwHYmuP64DOcRR1EUip+zWAvT20ETBcA0PnAzAcj9L0/PucBmCA==",
+            "client_ts": null,
+            "server_ts": "2026-06-25T11:50:14Z",
+            "body_enc": null,
+            "redacted": false,
+            "sd": true,
+            "sd_field_count": 5,
+            "sd_revealed": [
+                {
+                    "k": "action",
+                    "v": "deploy",
+                    "s": "8ecc21cfb316eec6e2dda90ee1572d0d",
+                    "proof": [
+                        {
+                            "hash": "33c5822a505259e15d1cb81682146d62c5bf7575776b5c296b2eb52331411d71",
+                            "side": "right"
+                        },
+                        {
+                            "hash": "761eb118a288449607f269bd3f60a98af9cefce08dec58dac78fed2d75883042",
+                            "side": "right"
+                        },
+                        {
+                            "hash": "ff07a9f77144f5bca5d1c83fbfd67bd47a081133d3de0a98d336b789eaadd483",
+                            "side": "right"
+                        }
+                    ]
+                },
+                {
+                    "k": "service",
+                    "v": "singularity",
+                    "s": "f72f073729b69089ce6e5312555abb8a",
+                    "proof": [
+                        {
+                            "hash": "29c77fdb845082ada1dd78fe5bef97247d8ec2ca07ee4deeb9ba57228d03c53a",
+                            "side": "left"
+                        }
+                    ]
+                },
+                {
+                    "k": "commit",
+                    "v": "a1b2c3d",
+                    "s": "fb5fd6fa03b164ae17fb7e3a556134e2",
+                    "proof": [
+                        {
+                            "hash": "af705a6a9b1977eed91486512c190c543d28c080228589f9908493fc4d9873bb",
+                            "side": "right"
+                        },
+                        {
+                            "hash": "0dfdfa5526b42ddc7bd5c8dca5e2143a9aafed88a399ef2ed288a00cabcbedf1",
+                            "side": "left"
+                        },
+                        {
+                            "hash": "ff07a9f77144f5bca5d1c83fbfd67bd47a081133d3de0a98d336b789eaadd483",
+                            "side": "right"
+                        }
+                    ]
+                }
+            ],
+            "sd_withheld": [
+                "api_secret",
+                "cost_usd"
+            ],
+            "merkle_proof": [
+                {
+                    "hash": "ec77bc9c475d67b018cd9c30fd866e2db0c2ce3488852bccd63b5f087438474c",
+                    "side": "left"
+                }
+            ],
+            "checkpoint_id": 27
+        }
+    ],
+    "checkpoints": [
+        {
+            "id": 27,
+            "seq_start": 0,
+            "seq_end": 1,
+            "merkle_root": "021c1d511d5f34ff833d678ce794035e50763535075d5aa6ea96992f72680a54",
+            "head_hash": "2615110ef164ab00b540010f1f377e3b80991b219c468c210bb2baf75c2c828f",
+            "prev_checkpoint_hash": null,
+            "recorder_sig": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+            "nostr_event_id": null,
+            "bitcoin_nostr_event_id": null,
+            "proof_ots": null,
+            "anchors": [
+                {
+                    "method": "self",
+                    "token_blob": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+                    "external_ts": "2026-06-25T11:50:14Z",
+                    "status": "confirmed"
+                }
+            ],
+            "witnesses": []
+        }
+    ]
+}

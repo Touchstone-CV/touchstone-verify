@@ -1,0 +1,20 @@
+{
+    "note": "Verifier conformance corpus. Each *_valid.json must verify ok=true. Harnesses also apply the listed tampers and expect ok=false.",
+    "cases": [
+        {
+            "file": "plain_valid.json",
+            "expect_ok": true
+        },
+        {
+            "file": "sd_valid.json",
+            "expect_ok": true,
+            "withheld_absent": "sk_live_SECRET"
+        }
+    ],
+    "tampers": [
+        "entry_hash",
+        "actor_sig",
+        "checkpoint_root",
+        "sd_revealed_value"
+    ]
+}

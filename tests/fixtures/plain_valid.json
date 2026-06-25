@@ -1,0 +1,122 @@
+{
+    "format": "touchstone-disclosure/1",
+    "recorder": {
+        "public_id": "rec_01kvz9vjr0wpwqn78rerxgw9xd",
+        "subject_sub": "conf-7f41fee2",
+        "signing_pubkey": "PuJ7Z0X+sSsVqiy3u2eUY9L5u1i9zZ/67k/Mo1L9M50=",
+        "signing_keys": [
+            {
+                "pubkey": "PuJ7Z0X+sSsVqiy3u2eUY9L5u1i9zZ/67k/Mo1L9M50=",
+                "from_seq": 0
+            }
+        ],
+        "trust_tier": "evidence"
+    },
+    "server_pubkey": null,
+    "nostr": null,
+    "entries": [
+        {
+            "seq": 0,
+            "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "entry_hash": "52ad78dcc092982e4252dd16233ed5baab2d93da48c65f97705ee0017556d7c2",
+            "event_type": "genesis",
+            "payload_hash": "d5876f354a891c445676551a972adc2333e10caa9c51ff5fd869f10f3592bac6",
+            "actor_sub": "conf-7f41fee2",
+            "counterparty_sub": null,
+            "counterparty_sig": null,
+            "counterparty_pubkey": null,
+            "counterparty_grade": null,
+            "actor_sig": "aghp+yfcktukoXKDPgMFADUc9WD6xGUZDTvTd9CEChCddCdCgT5AcXAreZpntf9g6DttFPLECNt/DgD9eLhxCQ==",
+            "client_ts": null,
+            "server_ts": "2026-06-25T11:50:14Z",
+            "body_enc": "{\"type\":\"genesis\",\"subject_sub\":\"conf-7f41fee2\",\"signing_pubkey\":\"PuJ7Z0X+sSsVqiy3u2eUY9L5u1i9zZ/67k/Mo1L9M50=\"}",
+            "redacted": false,
+            "merkle_proof": [
+                {
+                    "hash": "e44c88324580664407bafa61c09e04e5db077ab59a41fa4425fcfb7e4d48e291",
+                    "side": "right"
+                },
+                {
+                    "hash": "dfd293f4862236e22543a017735c8101fc6bf07f29b75fd72fe1f0ee9c60ced0",
+                    "side": "right"
+                }
+            ],
+            "checkpoint_id": 26
+        },
+        {
+            "seq": 1,
+            "prev_hash": "52ad78dcc092982e4252dd16233ed5baab2d93da48c65f97705ee0017556d7c2",
+            "entry_hash": "047db2a1a89dd8e5d236822330d5cf2f709733a1ca0cc0c34a7dce7105be5937",
+            "event_type": "tool_call",
+            "payload_hash": "e72f1cded816ca2b6333c48a5e01d510ea09c009fcaec064870f3f5a10333d56",
+            "actor_sub": "conf-7f41fee2",
+            "counterparty_sub": null,
+            "counterparty_sig": null,
+            "counterparty_pubkey": null,
+            "counterparty_grade": null,
+            "actor_sig": "+5Iz4doFepPY6rk5B+z6LXkbgci0Qlc+3Jm2RkMb+eSkIvmQhffLh5T2UUyWifjFVfaMrUvdwU3v/ji5rvcdAg==",
+            "client_ts": null,
+            "server_ts": "2026-06-25T11:50:14Z",
+            "body_enc": "{\"tool\":\"search\",\"n\":3}",
+            "redacted": false,
+            "merkle_proof": [
+                {
+                    "hash": "efcc9ec6a51029134bfd389b34ac142e8eeec6d4e1200cef9e9fd99ef3ba7ae6",
+                    "side": "left"
+                },
+                {
+                    "hash": "dfd293f4862236e22543a017735c8101fc6bf07f29b75fd72fe1f0ee9c60ced0",
+                    "side": "right"
+                }
+            ],
+            "checkpoint_id": 26
+        },
+        {
+            "seq": 2,
+            "prev_hash": "047db2a1a89dd8e5d236822330d5cf2f709733a1ca0cc0c34a7dce7105be5937",
+            "entry_hash": "0b592b2c7f2427a226bce8cb57cf4ada2aff98d1b1040667b6776434467bc7e0",
+            "event_type": "commitment",
+            "payload_hash": "604bc86d1662c7b3c39331e5a88e8cfbdd49affb165a051bfb15739044a90d25",
+            "actor_sub": "conf-7f41fee2",
+            "counterparty_sub": null,
+            "counterparty_sig": null,
+            "counterparty_pubkey": null,
+            "counterparty_grade": null,
+            "actor_sig": "D7kpmFRwBkk/fyw+k67MD1D2uTf1tZojXCGU02f7Q1V+oB6DBuhHxNGtQQnoTvg0YyYdcyw303sXFtNG3IUsCw==",
+            "client_ts": null,
+            "server_ts": "2026-06-25T11:50:14Z",
+            "body_enc": "{\"promise\":\"ship\",\"by\":\"2026-07-01\"}",
+            "redacted": false,
+            "merkle_proof": [
+                {
+                    "hash": "813bff4559ffc8474ec82055b0444d4e334cdeca0e52e358e9f3b95fbb635e71",
+                    "side": "left"
+                }
+            ],
+            "checkpoint_id": 26
+        }
+    ],
+    "checkpoints": [
+        {
+            "id": 26,
+            "seq_start": 0,
+            "seq_end": 2,
+            "merkle_root": "2d4b732a0a0547dcac44589d563b1ae5942395bc40bd94709f422c1a9a89691e",
+            "head_hash": "0b592b2c7f2427a226bce8cb57cf4ada2aff98d1b1040667b6776434467bc7e0",
+            "prev_checkpoint_hash": null,
+            "recorder_sig": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+            "nostr_event_id": null,
+            "bitcoin_nostr_event_id": null,
+            "proof_ots": null,
+            "anchors": [
+                {
+                    "method": "self",
+                    "token_blob": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+                    "external_ts": "2026-06-25T11:50:14Z",
+                    "status": "confirmed"
+                }
+            ],
+            "witnesses": []
+        }
+    ]
+}
