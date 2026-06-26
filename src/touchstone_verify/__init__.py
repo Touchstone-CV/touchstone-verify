@@ -6,4 +6,4 @@
 from .verify import jcs, verify_disclosure
 
 __all__ = ["verify_disclosure", "jcs"]
-__version__ = "0.1.0"
+__version__ = "0.2.0"

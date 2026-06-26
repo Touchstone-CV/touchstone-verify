@@ -1,12 +1,12 @@
 {
     "format": "touchstone-disclosure/1",
     "recorder": {
-        "public_id": "rec_01kvz9vjsfpvz57172ssbgaqw6",
-        "subject_sub": "conf-e9c6e0f1",
-        "signing_pubkey": "FvqMyR8PlL4Y2KzApJrVfxQw/L+tc4l7yVszCUmEBFg=",
+        "public_id": "rec_01kw14h7h23j8at3thb4kky6wv",
+        "subject_sub": "conf-8dcacf92",
+        "signing_pubkey": "gBNI4HwTFmNF3MJbc5AqtGzge2VOy3WPNLquggfx7vk=",
         "signing_keys": [
             {
-                "pubkey": "FvqMyR8PlL4Y2KzApJrVfxQw/L+tc4l7yVszCUmEBFg=",
+                "pubkey": "gBNI4HwTFmNF3MJbc5AqtGzge2VOy3WPNLquggfx7vk=",
                 "from_seq": 0
             }
         ],
@@ -18,41 +18,41 @@
         {
             "seq": 0,
             "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-            "entry_hash": "3a0625df3d8d3a657f84e2176635415a86d09498009276c6e20cdcc631d5f6ba",
+            "entry_hash": "3532f4a9589df3030a7028f7f0787c486099e6766c98e05766d568f4d328ab65",
             "event_type": "genesis",
-            "payload_hash": "4967e072dc28ae6e9487a08fa462e1ca177416916accfa8d8c0502dd6973a833",
-            "actor_sub": "conf-e9c6e0f1",
+            "payload_hash": "8eb9f739211d9343f5504c6d102ae677c77c19dafc7d18f0e2c08cdbcf2a715c",
+            "actor_sub": "conf-8dcacf92",
             "counterparty_sub": null,
             "counterparty_sig": null,
             "counterparty_pubkey": null,
             "counterparty_grade": null,
-            "actor_sig": "EmPiZ2woajPOgRwbhrMz5HpkXhuxA5+zBT4zktwRA5Ll9zTB4R9n7j5haO557f50/cvXdWCmmFj0Ppbs66BTAQ==",
+            "actor_sig": "j8a+YEOtQ0scrHCFCOrDPR71KZG97frSAtyBWvbiEFhj12o714cwcn4N/hKT9b15rFMaptNoFv4SD1dF5QB1Cw==",
             "client_ts": null,
-            "server_ts": "2026-06-25T11:50:14Z",
-            "body_enc": "{\"type\":\"genesis\",\"subject_sub\":\"conf-e9c6e0f1\",\"signing_pubkey\":\"FvqMyR8PlL4Y2KzApJrVfxQw/L+tc4l7yVszCUmEBFg=\"}",
+            "server_ts": "2026-06-26T04:55:41Z",
+            "body_enc": "{\"type\":\"genesis\",\"subject_sub\":\"conf-8dcacf92\",\"signing_pubkey\":\"gBNI4HwTFmNF3MJbc5AqtGzge2VOy3WPNLquggfx7vk=\"}",
             "redacted": false,
             "merkle_proof": [
                 {
-                    "hash": "caa8173cc9d9405249f56b45b9165aff9959c7514c53250705e9323324f9537e",
+                    "hash": "c92c53a94263131823956728196068266a817796338cc2957b587b6cb2a4d871",
                     "side": "right"
                 }
             ],
-            "checkpoint_id": 27
+            "checkpoint_id": 72
         },
         {
             "seq": 1,
-            "prev_hash": "3a0625df3d8d3a657f84e2176635415a86d09498009276c6e20cdcc631d5f6ba",
-            "entry_hash": "2615110ef164ab00b540010f1f377e3b80991b219c468c210bb2baf75c2c828f",
+            "prev_hash": "3532f4a9589df3030a7028f7f0787c486099e6766c98e05766d568f4d328ab65",
+            "entry_hash": "128a07b275e187ffc60a761f2060e861dd2a97aff536fda81ff2ed994f646da0",
             "event_type": "tool_call",
-            "payload_hash": "a720c94ce09af4bcadd991beeb2b42853765e62e170e873694e2fd9cde898a8b",
-            "actor_sub": "conf-e9c6e0f1",
+            "payload_hash": "b00dce01111ebfce6e2a1c8240268366123f94af4c484e2364c0f917e804d6f3",
+            "actor_sub": "conf-8dcacf92",
             "counterparty_sub": null,
             "counterparty_sig": null,
             "counterparty_pubkey": null,
             "counterparty_grade": null,
-            "actor_sig": "Lv8bTe03pGZKB077YvHQ3Uydk1vGBYjg0EjUwHYmuP64DOcRR1EUip+zWAvT20ETBcA0PnAzAcj9L0/PucBmCA==",
+            "actor_sig": "yHn8sYrLp8rMZXNN/2D/htXHgmQCcUHfrwKKrVlrCLocl06z1VWKbCATP0idyXKvSKNdURmJig5GsIQK6jPMBQ==",
             "client_ts": null,
-            "server_ts": "2026-06-25T11:50:14Z",
+            "server_ts": "2026-06-26T04:55:41Z",
             "body_enc": null,
             "redacted": false,
             "sd": true,
@@ -61,18 +61,18 @@
                 {
                     "k": "action",
                     "v": "deploy",
-                    "s": "8ecc21cfb316eec6e2dda90ee1572d0d",
+                    "s": "bbc2526ab4372974d2766484131a772c",
                     "proof": [
                         {
-                            "hash": "33c5822a505259e15d1cb81682146d62c5bf7575776b5c296b2eb52331411d71",
+                            "hash": "461e0fbe359a6208e1a757c3ed8a2609c72121ff22ee6f454146ffb94889da7d",
+                            "side": "left"
+                        },
+                        {
+                            "hash": "4a48d7036980709d501723af27d3a632df38d4ef5a2a7ff24c40bdd8ca39692a",
                             "side": "right"
                         },
                         {
-                            "hash": "761eb118a288449607f269bd3f60a98af9cefce08dec58dac78fed2d75883042",
-                            "side": "right"
-                        },
-                        {
-                            "hash": "ff07a9f77144f5bca5d1c83fbfd67bd47a081133d3de0a98d336b789eaadd483",
+                            "hash": "78f0a69b48f33c05253630fbebbc510146390035885054c9c38148913725d6e9",
                             "side": "right"
                         }
                     ]
@@ -80,10 +80,14 @@
                 {
                     "k": "service",
                     "v": "singularity",
-                    "s": "f72f073729b69089ce6e5312555abb8a",
+                    "s": "62637dce159650ee424ae0c054505c25",
                     "proof": [
                         {
-                            "hash": "29c77fdb845082ada1dd78fe5bef97247d8ec2ca07ee4deeb9ba57228d03c53a",
+                            "hash": "10cbc0f853b2f08f18ede087e6ec06bf4a17ed087c0d017f513524a185070162",
+                            "side": "left"
+                        },
+                        {
+                            "hash": "95715d4ce78c54e551e5cab0ed66525626d363de5b86ffa4be10c8a44cffe2b3",
                             "side": "left"
                         }
                     ]
@@ -91,18 +95,18 @@
                 {
                     "k": "commit",
                     "v": "a1b2c3d",
-                    "s": "fb5fd6fa03b164ae17fb7e3a556134e2",
+                    "s": "14cb2e77e59183b0df91254a484e43a9",
                     "proof": [
                         {
-                            "hash": "af705a6a9b1977eed91486512c190c543d28c080228589f9908493fc4d9873bb",
-                            "side": "right"
-                        },
-                        {
-                            "hash": "0dfdfa5526b42ddc7bd5c8dca5e2143a9aafed88a399ef2ed288a00cabcbedf1",
+                            "hash": "06a73d73f36f6c5db45f0e9d1f9abca17849578a492aded79a7956bfcb23c560",
                             "side": "left"
                         },
                         {
-                            "hash": "ff07a9f77144f5bca5d1c83fbfd67bd47a081133d3de0a98d336b789eaadd483",
+                            "hash": "78a4b702e1e1f9c3a7d01346b5bd3185c9a4aed5b1d66d9e81ce34b5e3250e63",
+                            "side": "left"
+                        },
+                        {
+                            "hash": "78f0a69b48f33c05253630fbebbc510146390035885054c9c38148913725d6e9",
                             "side": "right"
                         }
                     ]
@@ -112,24 +116,48 @@
                 "api_secret",
                 "cost_usd"
             ],
+            "sd_keyset": {
+                "keys": [
+                    "action",
+                    "api_secret",
+                    "commit",
+                    "cost_usd",
+                    "service"
+                ],
+                "proof": [
+                    {
+                        "hash": "0298a18603eb3add83980176b7835ba63375f0c5021a8a9ca5723f11460f15c2",
+                        "side": "right"
+                    },
+                    {
+                        "hash": "4a48d7036980709d501723af27d3a632df38d4ef5a2a7ff24c40bdd8ca39692a",
+                        "side": "right"
+                    },
+                    {
+                        "hash": "78f0a69b48f33c05253630fbebbc510146390035885054c9c38148913725d6e9",
+                        "side": "right"
+                    }
+                ]
+            },
             "merkle_proof": [
                 {
-                    "hash": "ec77bc9c475d67b018cd9c30fd866e2db0c2ce3488852bccd63b5f087438474c",
+                    "hash": "47c8d4f69a59ede84efbb6b03935ab9ab1bebc7a7e5ae95967e15b5acd43dbb3",
                     "side": "left"
                 }
             ],
-            "checkpoint_id": 27
+            "checkpoint_id": 72
         }
     ],
     "checkpoints": [
         {
-            "id": 27,
+            "id": 72,
             "seq_start": 0,
             "seq_end": 1,
-            "merkle_root": "021c1d511d5f34ff833d678ce794035e50763535075d5aa6ea96992f72680a54",
-            "head_hash": "2615110ef164ab00b540010f1f377e3b80991b219c468c210bb2baf75c2c828f",
+            "merkle_root": "918bdda2ec583562a9a773d280b690cb3283803fbae184e91c6561ae4128fdaf",
+            "head_hash": "128a07b275e187ffc60a761f2060e861dd2a97aff536fda81ff2ed994f646da0",
             "prev_checkpoint_hash": null,
             "recorder_sig": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+            "created_at": "2026-06-26T04:55:42Z",
             "nostr_event_id": null,
             "bitcoin_nostr_event_id": null,
             "proof_ots": null,
@@ -137,7 +165,7 @@
                 {
                     "method": "self",
                     "token_blob": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-                    "external_ts": "2026-06-25T11:50:14Z",
+                    "external_ts": "2026-06-26T04:55:42Z",
                     "status": "confirmed"
                 }
             ],

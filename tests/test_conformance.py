@@ -31,6 +31,10 @@ TAMPERS = {
         (f.__setitem__("v", "__TAMPERED__") for e in b["entries"] if e.get("sd") for f in e.get("sd_revealed", [])[:1]),
         None,
     ),
+    "sd_keyset_drop": lambda b: next(
+        (e["sd_keyset"]["keys"].pop() for e in b["entries"] if e.get("sd_keyset", {}).get("keys")),
+        None,
+    ),
 }
 
 

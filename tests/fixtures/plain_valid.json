@@ -1,12 +1,12 @@
 {
     "format": "touchstone-disclosure/1",
     "recorder": {
-        "public_id": "rec_01kvz9vjr0wpwqn78rerxgw9xd",
-        "subject_sub": "conf-7f41fee2",
-        "signing_pubkey": "PuJ7Z0X+sSsVqiy3u2eUY9L5u1i9zZ/67k/Mo1L9M50=",
+        "public_id": "rec_01kw14h5jqhw330vgcfv6p9ne2",
+        "subject_sub": "conf-4dfffe8d",
+        "signing_pubkey": "xDj1MDi6DdjN9NStYI1AVxQQTGYEmeg1OFx48EYr2ng=",
         "signing_keys": [
             {
-                "pubkey": "PuJ7Z0X+sSsVqiy3u2eUY9L5u1i9zZ/67k/Mo1L9M50=",
+                "pubkey": "xDj1MDi6DdjN9NStYI1AVxQQTGYEmeg1OFx48EYr2ng=",
                 "from_seq": 0
             }
         ],
@@ -18,93 +18,94 @@
         {
             "seq": 0,
             "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-            "entry_hash": "52ad78dcc092982e4252dd16233ed5baab2d93da48c65f97705ee0017556d7c2",
+            "entry_hash": "98db2dc740789901a91dbb9d8d77e5f077c566c02281669994801180786945a3",
             "event_type": "genesis",
-            "payload_hash": "d5876f354a891c445676551a972adc2333e10caa9c51ff5fd869f10f3592bac6",
-            "actor_sub": "conf-7f41fee2",
+            "payload_hash": "1b2796d21cd7429f169a4152772dff651cf7c48b665a61d64c4d9fc330e7350f",
+            "actor_sub": "conf-4dfffe8d",
             "counterparty_sub": null,
             "counterparty_sig": null,
             "counterparty_pubkey": null,
             "counterparty_grade": null,
-            "actor_sig": "aghp+yfcktukoXKDPgMFADUc9WD6xGUZDTvTd9CEChCddCdCgT5AcXAreZpntf9g6DttFPLECNt/DgD9eLhxCQ==",
+            "actor_sig": "/FJ2DAMkIBpMZTYcujetUZUzUJ00X5qOsEo+FUK3b3nmgljCDwMv3kArDNaaMPCHaU7wpOfYixvNPKH9itjXDQ==",
             "client_ts": null,
-            "server_ts": "2026-06-25T11:50:14Z",
-            "body_enc": "{\"type\":\"genesis\",\"subject_sub\":\"conf-7f41fee2\",\"signing_pubkey\":\"PuJ7Z0X+sSsVqiy3u2eUY9L5u1i9zZ/67k/Mo1L9M50=\"}",
+            "server_ts": "2026-06-26T04:55:39Z",
+            "body_enc": "{\"type\":\"genesis\",\"subject_sub\":\"conf-4dfffe8d\",\"signing_pubkey\":\"xDj1MDi6DdjN9NStYI1AVxQQTGYEmeg1OFx48EYr2ng=\"}",
             "redacted": false,
             "merkle_proof": [
                 {
-                    "hash": "e44c88324580664407bafa61c09e04e5db077ab59a41fa4425fcfb7e4d48e291",
+                    "hash": "2a09fc47b159087a0faad75dcaa6f6f094aec6cc3a1902c6e72fc583909582e2",
                     "side": "right"
                 },
                 {
-                    "hash": "dfd293f4862236e22543a017735c8101fc6bf07f29b75fd72fe1f0ee9c60ced0",
+                    "hash": "c3f6aa44161e57f4ad487e0aeb7409eb3193303d8d9aaf256b0d99e94536084d",
                     "side": "right"
                 }
             ],
-            "checkpoint_id": 26
+            "checkpoint_id": 71
         },
         {
             "seq": 1,
-            "prev_hash": "52ad78dcc092982e4252dd16233ed5baab2d93da48c65f97705ee0017556d7c2",
-            "entry_hash": "047db2a1a89dd8e5d236822330d5cf2f709733a1ca0cc0c34a7dce7105be5937",
+            "prev_hash": "98db2dc740789901a91dbb9d8d77e5f077c566c02281669994801180786945a3",
+            "entry_hash": "32c6dcb0b6ae0f3d3997925ea594f0ee642f0619b3cd351b24f52288c3c127c8",
             "event_type": "tool_call",
             "payload_hash": "e72f1cded816ca2b6333c48a5e01d510ea09c009fcaec064870f3f5a10333d56",
-            "actor_sub": "conf-7f41fee2",
+            "actor_sub": "conf-4dfffe8d",
             "counterparty_sub": null,
             "counterparty_sig": null,
             "counterparty_pubkey": null,
             "counterparty_grade": null,
-            "actor_sig": "+5Iz4doFepPY6rk5B+z6LXkbgci0Qlc+3Jm2RkMb+eSkIvmQhffLh5T2UUyWifjFVfaMrUvdwU3v/ji5rvcdAg==",
+            "actor_sig": "65LMMLjR4PrEk2F4D9ENmF1nOBSvdMFeGMiV0Pku0v4qsRf5+VkqQ/qCZVNAexPQ7LlbDgiMka0A6mdxsr2SAg==",
             "client_ts": null,
-            "server_ts": "2026-06-25T11:50:14Z",
+            "server_ts": "2026-06-26T04:55:39Z",
             "body_enc": "{\"tool\":\"search\",\"n\":3}",
             "redacted": false,
             "merkle_proof": [
                 {
-                    "hash": "efcc9ec6a51029134bfd389b34ac142e8eeec6d4e1200cef9e9fd99ef3ba7ae6",
+                    "hash": "606bed58b2d12723d09da0677d3f698b4247aec680972046eca5a66ab4593aee",
                     "side": "left"
                 },
                 {
-                    "hash": "dfd293f4862236e22543a017735c8101fc6bf07f29b75fd72fe1f0ee9c60ced0",
+                    "hash": "c3f6aa44161e57f4ad487e0aeb7409eb3193303d8d9aaf256b0d99e94536084d",
                     "side": "right"
                 }
             ],
-            "checkpoint_id": 26
+            "checkpoint_id": 71
         },
         {
             "seq": 2,
-            "prev_hash": "047db2a1a89dd8e5d236822330d5cf2f709733a1ca0cc0c34a7dce7105be5937",
-            "entry_hash": "0b592b2c7f2427a226bce8cb57cf4ada2aff98d1b1040667b6776434467bc7e0",
+            "prev_hash": "32c6dcb0b6ae0f3d3997925ea594f0ee642f0619b3cd351b24f52288c3c127c8",
+            "entry_hash": "df5013ba2c667795a46dbe10ba501b45afde832d60dd109a10930e191919724c",
             "event_type": "commitment",
             "payload_hash": "604bc86d1662c7b3c39331e5a88e8cfbdd49affb165a051bfb15739044a90d25",
-            "actor_sub": "conf-7f41fee2",
+            "actor_sub": "conf-4dfffe8d",
             "counterparty_sub": null,
             "counterparty_sig": null,
             "counterparty_pubkey": null,
             "counterparty_grade": null,
-            "actor_sig": "D7kpmFRwBkk/fyw+k67MD1D2uTf1tZojXCGU02f7Q1V+oB6DBuhHxNGtQQnoTvg0YyYdcyw303sXFtNG3IUsCw==",
+            "actor_sig": "0A/tDcr6PELk42hfAC9aoEooETJ+4gI+yxVvHo84ey8bANWLorcnulPp4Q1BB+9k+ipocqad62D+Sk/HlT7mCA==",
             "client_ts": null,
-            "server_ts": "2026-06-25T11:50:14Z",
+            "server_ts": "2026-06-26T04:55:40Z",
             "body_enc": "{\"promise\":\"ship\",\"by\":\"2026-07-01\"}",
             "redacted": false,
             "merkle_proof": [
                 {
-                    "hash": "813bff4559ffc8474ec82055b0444d4e334cdeca0e52e358e9f3b95fbb635e71",
+                    "hash": "92845cad67f83b8da23873b089dd6722e52921f328bcd4b9e54b72cfef1ae620",
                     "side": "left"
                 }
             ],
-            "checkpoint_id": 26
+            "checkpoint_id": 71
         }
     ],
     "checkpoints": [
         {
-            "id": 26,
+            "id": 71,
             "seq_start": 0,
             "seq_end": 2,
-            "merkle_root": "2d4b732a0a0547dcac44589d563b1ae5942395bc40bd94709f422c1a9a89691e",
-            "head_hash": "0b592b2c7f2427a226bce8cb57cf4ada2aff98d1b1040667b6776434467bc7e0",
+            "merkle_root": "8928efb5291839f3357137f1d9fda2666ae60f7ccf2da4cfaf2ec7383112a0b6",
+            "head_hash": "df5013ba2c667795a46dbe10ba501b45afde832d60dd109a10930e191919724c",
             "prev_checkpoint_hash": null,
             "recorder_sig": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+            "created_at": "2026-06-26T04:55:40Z",
             "nostr_event_id": null,
             "bitcoin_nostr_event_id": null,
             "proof_ots": null,
@@ -112,7 +113,7 @@
                 {
                     "method": "self",
                     "token_blob": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-                    "external_ts": "2026-06-25T11:50:14Z",
+                    "external_ts": "2026-06-26T04:55:40Z",
                     "status": "confirmed"
                 }
             ],

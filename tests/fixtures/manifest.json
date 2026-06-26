@@ -15,6 +15,7 @@
         "entry_hash",
         "actor_sig",
         "checkpoint_root",
-        "sd_revealed_value"
+        "sd_revealed_value",
+        "sd_keyset_drop"
     ]
 }

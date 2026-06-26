@@ -167,13 +167,30 @@ def verify_disclosure(b: dict) -> dict:
                 f"merkle inclusion in checkpoint #{cp['id']}", True)
 
         if e.get("sd"):
-            for f in e.get("sd_revealed", []):
+            revealed = e.get("sd_revealed", [])
+            committed = None
+            ks = e.get("sd_keyset")
+            if ks:
+                keys = sorted(ks.get("keys", []))
+                ks_leaf = _sha256_hex(("tsd:keyset:v1\n" + jcs(keys)).encode("utf-8"))
+                add(_merkle_from_proof(ks_leaf, ks.get("proof", [])) == e["payload_hash"],
+                    f"selective-disclosure key-set committed ({len(keys)} fields)", True)
+                committed = keys
+            for f in revealed:
                 leaf = _sha256_hex(("tsd:field:v1\n" + jcs([f["k"], f["v"], f["s"]])).encode("utf-8"))
                 add(_merkle_from_proof(leaf, f.get("proof", [])) == e["payload_hash"],
                     f'selective field "{f["k"]}" proven in payload_hash', True)
-            shown = len(e.get("sd_revealed", []))
-            count = e.get("sd_field_count", 0)
-            add(True, f"selective disclosure: {shown} of {count} field(s) revealed, {count - shown} withheld", False)
+                if committed is not None:
+                    add(f["k"] in committed, f'revealed field "{f["k"]}" in committed key-set', True)
+            shown = len(revealed)
+            if committed is not None:
+                revealed_keys = [f["k"] for f in revealed]
+                withheld = [k for k in committed if k not in revealed_keys]
+                add(True, f"selective disclosure: {shown} of {len(committed)} committed field(s) revealed; "
+                          f"withheld (provably sealed): {', '.join(withheld) or 'none'}", False)
+            else:
+                count = e.get("sd_field_count", 0)
+                add(True, f"selective disclosure: {shown} of {count} field(s) revealed (key-set not committed)", False)
 
         entries_out.append({"seq": int(e["seq"]), "type": e.get("event_type", ""),
                             "redacted": bool(e.get("redacted")), "checks": checks})
