@@ -105,6 +105,27 @@ def verify_disclosure(b: dict) -> dict:
         if fatal and not ok:
             state["ok"] = False
 
+    # Key epochs must be introduced by their key_rotation entry when it's in the bundle,
+    # else an attacker injects a forged epoch (see verify.php). Genesis is bound by the PoP.
+    for ep in epochs:
+        if int(ep["from_seq"]) == 0:
+            continue
+        rot = by_seq.get(int(ep["from_seq"]) - 1)
+        if rot is None:
+            cp_add(True, f"key epoch from seq {ep['from_seq']} relies on a key_rotation entry not in this disclosure — verify the full chain", False)
+            continue
+        rb = {}
+        if rot.get("body_enc"):
+            try:
+                rb = json.loads(rot["body_enc"])
+            except Exception:
+                rb = {}
+        cp_add(rot.get("event_type") == "key_rotation" and rb.get("new_signing_pubkey") == ep["pubkey"],
+               f"key epoch from seq {ep['from_seq']} introduced by its key_rotation entry", True)
+    cp_add(True, f'attribution binds to the genesis key, which self-claims subject "{rec.get("subject_sub")}"; '
+                 f'confirm that key at /.well-known/touchstone/pubkeys/{rec.get("subject_sub")} — this bundle alone '
+                 "does not prove the subject→key binding", False)
+
     prev_cp = None
     for cp in sorted(cp_by_id.values(), key=lambda c: c.get("seq_start", 0)):
         if server_pub:

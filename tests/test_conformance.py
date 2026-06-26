@@ -35,6 +35,7 @@ TAMPERS = {
         (e["sd_keyset"]["keys"].pop() for e in b["entries"] if e.get("sd_keyset", {}).get("keys")),
         None,
     ),
+    "inject_epoch": lambda b: b["recorder"].setdefault("signing_keys", []).append({"from_seq": 1, "pubkey": "A" * 43 + "="}),
 }
 
 
