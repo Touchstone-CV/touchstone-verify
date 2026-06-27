@@ -260,7 +260,13 @@ def verify_disclosure(b: dict) -> dict:
                             add(True, f"anchored (self, {a.get('external_ts')})" + (" — server signature verified" if self_ok else ""), False)
                             any_confirmed = True
                     elif a.get("method") == "ots" and a.get("status") == "confirmed" and blob.get("bitcoin_height"):
-                        add(True, f"OTS → Bitcoin block {blob['bitcoin_height']} ({a.get('external_ts')}); cryptographic check: ots verify", False)
+                        # The height is the SERVER'S claim; this offline check does not confirm the
+                        # proof commits to that block. (Self anchors above are signature-verified;
+                        # OTS needs Bitcoin, which is out of scope for an offline tool.) Say so, and
+                        # point at how to confirm it — don't present a claim as a verified fact.
+                        add(True, f"OTS → Bitcoin block {blob['bitcoin_height']} CLAIMED ({a.get('external_ts')}) "
+                                  f"— not confirmed against mainnet here; verify the downloadable .ots with "
+                                  f"`ots verify`, which recomputes the committed root against the real block", False)
                         any_confirmed = True
                     elif a.get("method") == "ots":
                         add(True, "OTS submitted, Bitcoin-pending (re-check with ots upgrade/verify)", False)
