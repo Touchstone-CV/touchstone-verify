@@ -71,7 +71,9 @@ def _entry_hash(e) -> str:
     # Present ONLY on bound entries → absent yields the exact legacy 7-field preimage, so unbound
     # entries and every pre-existing anchor verify unchanged.
     b = e.get("server_beacon")
-    if b:
+    if b is not None:
+        if not isinstance(b, dict) or not all(k in b for k in ("chain", "round", "randomness")):
+            return "malformed-server_beacon"   # present-but-malformed → never matches → reject (php/js parity)
         parts.append("beacon:%s:%s:%s" % (b["chain"], b["round"], b["randomness"]))
     return _sha256_hex("\n".join(parts).encode("utf-8"))
 
@@ -122,8 +124,11 @@ def verify_disclosure(b: dict) -> dict:
 
     server_pub = b.get("server_pubkey")
     server_pub = server_pub if isinstance(server_pub, str) and server_pub else None
-    cp_by_id = {cp.get("id"): cp for cp in checkpoints}
-    by_seq = {e.get("seq"): e for e in entries}
+    # Index defensively: a mutated/hostile bundle can carry an unhashable seq/id (a list) — skip those
+    # here (the per-entry field-type gate below rejects them) rather than raising, so verify_disclosure
+    # always returns a verdict instead of throwing on malformed input (php/js return a clean reject).
+    cp_by_id = {cp.get("id"): cp for cp in checkpoints if isinstance(cp, dict) and isinstance(cp.get("id"), (int, str, type(None)))}
+    by_seq = {e.get("seq"): e for e in entries if isinstance(e, dict) and isinstance(e.get("seq"), int)}
     state = {"ok": True}
     cp_checks = []
 
