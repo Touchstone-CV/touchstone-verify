@@ -11,5 +11,7 @@ jobs:
         with: { python-version: '3.11' }
       - name: Conformance self-test (verify vs shared corpus)
         run: python tests/test_conformance.py
+      - name: Columns k-model + beacon entry_hash fold (regression)
+        run: python tests/test_columns_and_beacon.py
       - name: Build sdist + wheel
         run: pip install build && python -m build

@@ -62,11 +62,18 @@ def _merkle_from_proof(leaf_hex: str, proof):
 
 
 def _entry_hash(e) -> str:
-    s = "\n".join([
+    parts = [
         str(e["seq"]), e["prev_hash"], e["server_ts"], e["payload_hash"],
         e["actor_sub"], e.get("counterparty_sub") or "", e["actor_sig"],
-    ])
-    return _sha256_hex(s.encode("utf-8"))
+    ]
+    # Beacon-bound entries (recorders with beacon_binding on) commit a drand round into entry_hash as
+    # a final `beacon:<chain>:<round>:<randomness>` line, so server_ts carries a checkable not-before.
+    # Present ONLY on bound entries → absent yields the exact legacy 7-field preimage, so unbound
+    # entries and every pre-existing anchor verify unchanged.
+    b = e.get("server_beacon")
+    if b:
+        parts.append("beacon:%s:%s:%s" % (b["chain"], b["round"], b["randomness"]))
+    return _sha256_hex("\n".join(parts).encode("utf-8"))
 
 
 def _signed_content(recorder_id: str, e) -> str:

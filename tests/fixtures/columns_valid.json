@@ -1,0 +1,83 @@
+{
+ "columns": [
+  {
+   "name": "digest",
+   "k": 0,
+   "proposition": "the body hashes to this",
+   "value": "b0f953a47b716b0f236c0cb0155feb13e3f9aa224077cb5b0a4ea70a2a7df73f",
+   "derivation": {
+    "alg": "sha256",
+    "input": "the returned summary bytes, domain-separated"
+   }
+  },
+  {
+   "name": "delivery_ack",
+   "k": 2,
+   "proposition": "the payer's endpoint acked at T over an unpredictable challenge",
+   "value": "ok",
+   "witnesses": [
+    {
+     "sub": "payer",
+     "pubkey": "0EqyMnQrtKs6E2i9RhXk5tAiSrcaAWuvhSCjMsl3hzc=",
+     "challenge": "blk-957400",
+     "sig": "9/CbAfFpqvjpdLacQpoIYkGA/WZNHGX7n/i+9rNjve0NECQZbRmu2kJmqZP9rMpbNlmoddavoXQD8Yte020JBg=="
+    }
+   ]
+  },
+  {
+   "name": "quorum",
+   "k": 3,
+   "proposition": "two independent observers saw state S at T",
+   "value": "S",
+   "witnesses": [
+    {
+     "sub": "obs-a",
+     "pubkey": "oJql9HpnWYAv+VX43C0qFKXJnSO+l/hkEn/5ODRVpPA=",
+     "challenge": "ra",
+     "sig": "y9oPoYbeVc8wIK3gk9ypflz37q12kLn8rHS7EcLWNw+VIx+0aIrY7KyrZgO/NF0gyVNR6i9rRBXtoDYkLs9XAg=="
+    },
+    {
+     "sub": "obs-b",
+     "pubkey": "F8t5+ytBIPKx7GXkGY1uCLKOgT/rAeSkAIObheGAgM4=",
+     "challenge": "rb",
+     "sig": "5OF+LQe7/rEMsoMRPOxnIqlMsTXOjVzgfL41cLPmYqhL8KNTwTAamiimbhISSVKyma+u9VMHgckwg/dF0bFmCA=="
+    }
+   ]
+  },
+  {
+   "name": "vendor_probes",
+   "k": 2,
+   "proposition": "two of the vendor's own probes reported success",
+   "value": "ok",
+   "witnesses": [
+    {
+     "sub": "probe-1",
+     "pubkey": "0EqyMnQrtKs6E2i9RhXk5tAiSrcaAWuvhSCjMsl3hzc=",
+     "challenge": "c1",
+     "sig": "obNlHLasJYyo4FVNbPwbwx4Nh2OxGhQAJGM+jKOjJ2y4O9+qQ84HqMFkeIsoIj3RF6OdqNM6WGC3OAKw1xIWCA==",
+     "controller": {
+      "pubkey": "2b8hSHSKhcidparY7gsPwtEF/TnUGkx5ZTY1TwrikAw=",
+      "sig": "KVnd4tEJNuvcNzFg60s1isPWNaD4SVDanS3UIrjK8vynvZoj59Kvj1A4NjUVfo65eCNNPku7h8GB1OmVRlw5BA=="
+     }
+    },
+    {
+     "sub": "probe-2",
+     "pubkey": "11l5O7wTooGagnx2rbb7qKSa7gB/SfLQmS2ZuCWtLEg=",
+     "challenge": "c2",
+     "sig": "mDKebdzysfAkWwOLCuK5sWXbymeD1bRRPngklJTxtUAjQWus5G/dVX31nyyfHFlGTFOH4o6iaP7PSxRvMCxtDA==",
+     "controller": {
+      "pubkey": "2b8hSHSKhcidparY7gsPwtEF/TnUGkx5ZTY1TwrikAw=",
+      "sig": "tcVkkhjKeKmC0KlRVM2Gq1yvXppLTw94tK3Z+SyLoubMnsYRse4PWYoSlXz4ax2tlRTbs9TIIyW9JWQqJ8r3CA=="
+     }
+    }
+   ]
+  },
+  {
+   "name": "note",
+   "k": 1,
+   "proposition": "own note",
+   "value": "went fine"
+  }
+ ],
+ "columns_sha256": "b26d17135ad241169abf83c8233f0fe4092562fd6cb36183da5cba644d78af09"
+}

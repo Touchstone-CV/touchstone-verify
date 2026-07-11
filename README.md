@@ -45,9 +45,29 @@ for e in result["entries"]:
         print(c["ok"], c["msg"])
 ```
 
+### Grade a receipt's columns by k
+
+```python
+from touchstone_verify import grade_columns, find_columns
+import json, urllib.request
+
+doc = json.load(urllib.request.urlopen("https://touchstone.cv/columns/<recorder>/<seq>"))
+cols, digest = find_columns(doc)
+r = grade_columns(cols, digest)
+print(r["coherent"], r["min_k"])     # True / cheapest falsehood path (min k across load-bearing columns)
+```
+
+`k` is the minimum number of independent parties who must collude before a column can be false,
+**computed from the evidence** (never the declared grade): `k=0` re-derivable, `k = 1 + distinct-control
+witnesses` (co-sigs collapse on a shared key or a receipt-carried controller binding, so it's an
+upper bound), `k=1` testimony. Declaring more strength than the evidence supports fails closed.
+
 ## What it checks
 
-- **Integrity** — every `entry_hash` recomputes from its fields.
+- **Integrity** — every `entry_hash` recomputes from its fields, **including the beacon fold**: a
+  `beacon_binding` recorder's entries carry `server_beacon = {chain, round, randomness}` as a final
+  `beacon:<chain>:<round>:<randomness>` line of the preimage (a checkable not-before). Absent → the
+  exact legacy 7-field preimage, so older entries verify unchanged.
 - **Attribution** — the subject signature verifies over the canonical signed content; genesis
   proof-of-possession; `key_rotation` new-key PoP; counterparty co-signatures.
 - **Ordering** — `prev_hash` chain linkage; Merkle inclusion in the cited checkpoint.
