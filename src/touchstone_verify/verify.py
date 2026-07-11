@@ -195,6 +195,19 @@ def verify_disclosure(b: dict) -> dict:
             cp_add(False, "malformed checkpoint — rejected", True)
         prev_cp = cp
 
+    # Committed beacon policy from the hash-committed genesis body: once a recorder declares
+    # beacon_from_seq=N, every entry at seq>=N must carry a beacon — a missing one is a contradiction,
+    # not a silence. Absent → no enforcement.
+    beacon_from_seq = None
+    _g = next((x for x in entries if x.get("seq") == 0 or x.get("event_type") == "genesis"), None)
+    if _g and _g.get("body_enc"):
+        try:
+            _bc = json.loads(_g["body_enc"]).get("beacon_commitment")
+            if isinstance(_bc, dict) and isinstance(_bc.get("from_seq"), int) and not isinstance(_bc.get("from_seq"), bool):
+                beacon_from_seq = _bc["from_seq"]
+        except Exception:
+            pass
+
     entries_out = []
     for e in entries:
         checks = []
@@ -217,6 +230,13 @@ def verify_disclosure(b: dict) -> dict:
 
         try:  # fail-closed: any malformed entry (missing field, bad type) → rejected
             add(_entry_hash(e) == e["entry_hash"], "entry_hash integrity", True)
+
+            # beacon commitment: seq >= from_seq must be beacon-bound. A malformed beacon already fails
+            # integrity above; this catches the ABSENT one (a valid legacy hash where policy required one).
+            if beacon_from_seq is not None and e["seq"] >= beacon_from_seq:
+                sb = e.get("server_beacon")
+                bound = isinstance(sb, dict) and all(k in sb for k in ("chain", "round", "randomness"))
+                add(bound, f"beacon commitment honored (seq >= {beacon_from_seq} is beacon-bound)", True)
 
             seq_key = key_for_seq(int(e["seq"]))
             if int(e["seq"]) == 0:

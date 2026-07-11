@@ -10,4 +10,4 @@ from .columns import evaluate_column, find_columns, grade_columns
 from .verify import jcs, verify_disclosure
 
 __all__ = ["verify_disclosure", "jcs", "grade_columns", "evaluate_column", "find_columns"]
-__version__ = "0.4.1"
+__version__ = "0.4.2"
