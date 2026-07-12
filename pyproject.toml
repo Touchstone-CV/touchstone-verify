@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "touchstone-verify"
-version = "0.4.2"
-description = "Independently verify a Touchstone disclosure — zero dependencies, pure Python."
+version = "0.5.0"
+description = "Touchstone SDK — verify a disclosure (zero deps) and mint one (the [record] extra)."
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "Apache-2.0" }
@@ -16,6 +16,11 @@ classifiers = [
   "Programming Language :: Python :: 3",
   "Topic :: Security :: Cryptography",
 ]
+
+[project.optional-dependencies]
+# Verification is dependency-free; minting (touchstone_verify.record) needs an Ed25519 SIGNER, which the
+# vendored verify-only curve code can't provide. `pip install "touchstone-verify[record]"` to mint.
+record = ["pynacl>=1.5"]
 
 [project.urls]
 Homepage = "https://touchstone.cv"

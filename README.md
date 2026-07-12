@@ -62,6 +62,33 @@ print(r["coherent"], r["min_k"])     # True / cheapest falsehood path (min k acr
 witnesses` (co-sigs collapse on a shared key or a receipt-carried controller binding, so it's an
 upper bound), `k=1` testimony. Declaring more strength than the evidence supports fails closed.
 
+## Mint a receipt (the producer half)
+
+Verification is dependency-free; **minting** needs an Ed25519 *signer*, so it lives behind an extra:
+
+```bash
+pip install "touchstone-verify[record]"
+```
+
+```python
+from touchstone_verify import Recorder
+
+# reads TOUCHSTONE_RECORDER / _API_KEY / _SUBJECT / _SIGNING_KEY (or _KEY_FILE={"seed_b64":…})
+r = Recorder.from_env()
+rc = r.record({"kind": "invoice", "amount": 100}, event_type="invoice")
+print(rc.seq, rc.entry_hash)          # the server's assignment; local_entry_hash_ok() confirms it
+
+rc.wait_for_anchor()                  # blocks until the next checkpoint sweeps this seq
+print(rc.verify())                    # payload_hash → entry_hash → checkpoint root  (ok: True)
+```
+
+Your key never leaves the process, and the payload is canonicalized **locally** using the *same*
+`jcs` / entry-hash code this package verifies with — one crypto core, no drift — so a malicious server
+cannot make you sign a different commitment than you intended. `Receipt.verify()` walks the receipt to
+its Bitcoin-anchored checkpoint (finish with `ots verify` on your own node). For a fully trustless
+recorder whose every entry is inclusion-provable, provision it with `app:provision-recorder
+--inclusion-public`.
+
 ## What it checks
 
 - **Integrity** — every `entry_hash` recomputes from its fields, **including the beacon fold**: a
