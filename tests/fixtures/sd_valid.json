@@ -1,12 +1,12 @@
 {
     "format": "touchstone-disclosure/1",
     "recorder": {
-        "public_id": "rec_01kw19gzwc10whdrjg7a54xsm8",
-        "subject_sub": "conf-ec04e9fc",
-        "signing_pubkey": "pfYPebEpTRMwRu3JB5WW8iIXuCXyvBUfK4LqM7SjSJo=",
+        "public_id": "rec_01kx87c0evhdtr4rya8namfweg",
+        "subject_sub": "conf-5408ddce",
+        "signing_pubkey": "GOIRRmf+vXfsbjHAjkKPMXkCvQ74ypijL+GkKCwdTJg=",
         "signing_keys": [
             {
-                "pubkey": "pfYPebEpTRMwRu3JB5WW8iIXuCXyvBUfK4LqM7SjSJo=",
+                "pubkey": "GOIRRmf+vXfsbjHAjkKPMXkCvQ74ypijL+GkKCwdTJg=",
                 "from_seq": 0
             }
         ],
@@ -18,41 +18,43 @@
         {
             "seq": 0,
             "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-            "entry_hash": "be61b9f9ef27a8e37a689a83f87dd5bcf4f8c8b901933aac6e0c4707b1701e65",
+            "entry_hash": "2b9fe556ca8b56a9dbf8f979d0e7cd9e02a9fe7fe7fa57e0950c65c449450f92",
             "event_type": "genesis",
-            "payload_hash": "ee192f032a98db2365bcf89e9987f23ac051fd31dff85c6bd18b36dbcd95e6f4",
-            "actor_sub": "conf-ec04e9fc",
+            "payload_hash": "2d3ac2acf220d7b4813cef046d1207cdaa405fec34705fbad793fd03aefb1ce0",
+            "actor_sub": "conf-5408ddce",
             "counterparty_sub": null,
             "counterparty_sig": null,
             "counterparty_pubkey": null,
             "counterparty_grade": null,
-            "actor_sig": "ohXFff4Qv7wDcuAshOwJlp9WVWHE94Hsad9XrFxVyOWUJT3O8SEmFIz2EIZugwDADYAqzI/LMNqgGvbeQKkJAg==",
+            "actor_sig": "bTUZIvCnBUZ+2rkAW1cb4IcL/8XTtyoQNlzRGDADjLC8rAEuxvkClqJMdNbSSkgdq1qTzqjj2bRbMB+z7O1JBw==",
             "client_ts": null,
-            "server_ts": "2026-06-26T06:22:56Z",
-            "body_enc": "{\"type\":\"genesis\",\"subject_sub\":\"conf-ec04e9fc\",\"signing_pubkey\":\"pfYPebEpTRMwRu3JB5WW8iIXuCXyvBUfK4LqM7SjSJo=\"}",
+            "server_ts": "2026-07-11T09:15:38Z",
+            "server_beacon": null,
+            "body_enc": "{\"type\":\"genesis\",\"subject_sub\":\"conf-5408ddce\",\"signing_pubkey\":\"GOIRRmf+vXfsbjHAjkKPMXkCvQ74ypijL+GkKCwdTJg=\"}",
             "redacted": false,
             "merkle_proof": [
                 {
-                    "hash": "c2e7cf70da2376bb872b0db62243ad7bf2644301ec490f2f460d5f10169c7fc2",
+                    "hash": "c9b451dfa39699fc1abd50a31ff75b3b03eeb85d2badaa59fd1f36b6988aa3e4",
                     "side": "right"
                 }
             ],
-            "checkpoint_id": 102
+            "checkpoint_id": 76
         },
         {
             "seq": 1,
-            "prev_hash": "be61b9f9ef27a8e37a689a83f87dd5bcf4f8c8b901933aac6e0c4707b1701e65",
-            "entry_hash": "b609349500c62cccdb445f1e7cf77390d8d23705be5db7b00fb0da06ac5435a3",
+            "prev_hash": "2b9fe556ca8b56a9dbf8f979d0e7cd9e02a9fe7fe7fa57e0950c65c449450f92",
+            "entry_hash": "34538fb0a309b37cd7f6b3c7bb2e739910e5f72387b8907b4875efbdde11327d",
             "event_type": "tool_call",
-            "payload_hash": "e2ccb9d36e0f2aed1bb51b2a08bc63de4cf4707944eb7d43d85dbf7f1ffb2328",
-            "actor_sub": "conf-ec04e9fc",
+            "payload_hash": "67d6b14241785b331fbdcfdaaf0d0b784565c4ae915c8de6ca0b7b30905a8ef8",
+            "actor_sub": "conf-5408ddce",
             "counterparty_sub": null,
             "counterparty_sig": null,
             "counterparty_pubkey": null,
             "counterparty_grade": null,
-            "actor_sig": "OGp3xc8F85TQscYgB84kdqa0sF6nsKD8d5w81ABtKv+UbhVmH8GVBKulyW6So0AuB2NgdA0WzBpNeWJliK0xBg==",
+            "actor_sig": "9Armnp5NTj0T5PqOH+gCsSYv5c8T4i35HWLwy6qwC87vPTK5MtwwtiMZA80XCK24OsD8ktZxAfIqKOIpWEdYDQ==",
             "client_ts": null,
-            "server_ts": "2026-06-26T06:22:56Z",
+            "server_ts": "2026-07-11T09:15:38Z",
+            "server_beacon": null,
             "body_enc": null,
             "redacted": false,
             "sd": true,
@@ -61,18 +63,18 @@
                 {
                     "k": "action",
                     "v": "deploy",
-                    "s": "b8761139b79bccc9833f02ce89b472ae",
+                    "s": "5fc07fdc9c8d74852427779e0ebabb91",
                     "proof": [
                         {
                             "hash": "461e0fbe359a6208e1a757c3ed8a2609c72121ff22ee6f454146ffb94889da7d",
                             "side": "left"
                         },
                         {
-                            "hash": "b3529f36e7194a24344f4baea2f3e7434164ce98981f743ed60d55eacc68cdca",
+                            "hash": "c184463361236563e52d53de973acc830abfec413bfa34c483d46a0cf453d288",
                             "side": "right"
                         },
                         {
-                            "hash": "dd43099d2f19dcc629c6cb3fc03072c1f036378f44f9dd9923abd1bc6d708035",
+                            "hash": "6cff945bea3fbce34a69fe4954d454a33c5df8dd7f9dad7f47b0172e0c5ab9f7",
                             "side": "right"
                         }
                     ]
@@ -80,14 +82,14 @@
                 {
                     "k": "service",
                     "v": "singularity",
-                    "s": "e8eecdce1dca19794cc714b486052513",
+                    "s": "9e10759a7ea4b44699b1c89c4735cf58",
                     "proof": [
                         {
-                            "hash": "9a785a78357688941fe51c45c03c1e368ef9f510f4d93decd716b335c5e0eca7",
+                            "hash": "5e6c702aa16dcd51f49a492595f50f741cb0492178dd097adb3f569c35b17c65",
                             "side": "left"
                         },
                         {
-                            "hash": "86c58c2ed3ce878ad9af07f781763aac8d12aab1860c6e2cea03a022c740383e",
+                            "hash": "09061cdaadfa9327e9a2aec9a29567277843d926f96aa946f4e90be2e3a2d8be",
                             "side": "left"
                         }
                     ]
@@ -95,18 +97,18 @@
                 {
                     "k": "commit",
                     "v": "a1b2c3d",
-                    "s": "04448a0d072cbd48806baabff42a0456",
+                    "s": "14e9726a70faf50859cac9d3e2f60a94",
                     "proof": [
                         {
-                            "hash": "cc9c4251d158daf66f122e05051f5904fb4d20314c3738a465b379c1db05ef35",
+                            "hash": "6e56cc89c6ff6121d69ef439d199c32953c608539c936714759e7dd73496b011",
                             "side": "left"
                         },
                         {
-                            "hash": "6537e6eead9b08c7ecec6f54931e51a12eb359badffda3189a8a1cf435a8b14c",
+                            "hash": "8d638862a9d9be22cd02aed6abcfa04fabbe9f69c67d8cee5f4454cfaf830492",
                             "side": "left"
                         },
                         {
-                            "hash": "dd43099d2f19dcc629c6cb3fc03072c1f036378f44f9dd9923abd1bc6d708035",
+                            "hash": "6cff945bea3fbce34a69fe4954d454a33c5df8dd7f9dad7f47b0172e0c5ab9f7",
                             "side": "right"
                         }
                     ]
@@ -126,38 +128,38 @@
                 ],
                 "proof": [
                     {
-                        "hash": "8b5bdf6789329dacc475f48f54ff7e19dc1afc99605a02585bc6a3c48ca4bd09",
+                        "hash": "8ea3ae7f75437469885fd4c05cde4fa5d17e023a89082dc1780d0d54b0f9da27",
                         "side": "right"
                     },
                     {
-                        "hash": "b3529f36e7194a24344f4baea2f3e7434164ce98981f743ed60d55eacc68cdca",
+                        "hash": "c184463361236563e52d53de973acc830abfec413bfa34c483d46a0cf453d288",
                         "side": "right"
                     },
                     {
-                        "hash": "dd43099d2f19dcc629c6cb3fc03072c1f036378f44f9dd9923abd1bc6d708035",
+                        "hash": "6cff945bea3fbce34a69fe4954d454a33c5df8dd7f9dad7f47b0172e0c5ab9f7",
                         "side": "right"
                     }
                 ]
             },
             "merkle_proof": [
                 {
-                    "hash": "90f4dbd8577e49b6e964bb596e8389b9af50eb44f85336ac9692c076e921bc0e",
+                    "hash": "5ebfd49abf27a8ee9e8417826728e40f3d74aae46ec81d4e4f57cef2982c9992",
                     "side": "left"
                 }
             ],
-            "checkpoint_id": 102
+            "checkpoint_id": 76
         }
     ],
     "checkpoints": [
         {
-            "id": 102,
+            "id": 76,
             "seq_start": 0,
             "seq_end": 1,
-            "merkle_root": "70845b8623c2e29981331f9ef79ded48ce4b5692a29e4fd79454c48263e8ee55",
-            "head_hash": "b609349500c62cccdb445f1e7cf77390d8d23705be5db7b00fb0da06ac5435a3",
+            "merkle_root": "02adf14827388b04f045ba35edaa4eea08a19351f81727bd1cf15aea8ca8c2bc",
+            "head_hash": "34538fb0a309b37cd7f6b3c7bb2e739910e5f72387b8907b4875efbdde11327d",
             "prev_checkpoint_hash": null,
             "recorder_sig": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-            "created_at": "2026-06-26T06:22:56Z",
+            "created_at": "2026-07-11T09:15:38Z",
             "nostr_event_id": null,
             "bitcoin_nostr_event_id": null,
             "proof_ots": null,
@@ -165,7 +167,7 @@
                 {
                     "method": "self",
                     "token_blob": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-                    "external_ts": "2026-06-26T06:22:56Z",
+                    "external_ts": "2026-07-11T09:15:38Z",
                     "status": "confirmed"
                 }
             ],

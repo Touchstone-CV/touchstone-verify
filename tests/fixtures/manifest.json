@@ -9,6 +9,11 @@
             "file": "sd_valid.json",
             "expect_ok": true,
             "withheld_absent": "sk_live_SECRET"
+        },
+        {
+            "file": "beacon_valid.json",
+            "expect_ok": true,
+            "note": "entry_hash folds server_beacon"
         }
     ],
     "tampers": [
@@ -17,6 +22,10 @@
         "checkpoint_root",
         "sd_revealed_value",
         "sd_keyset_drop",
-        "inject_epoch"
+        "inject_epoch",
+        "beacon_round",
+        "beacon_randomness",
+        "beacon_drop",
+        "beacon_inject"
     ]
 }

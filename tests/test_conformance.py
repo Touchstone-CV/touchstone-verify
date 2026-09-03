@@ -36,6 +36,13 @@ TAMPERS = {
         None,
     ),
     "inject_epoch": lambda b: b["recorder"].setdefault("signing_keys", []).append({"from_seq": 1, "pubkey": "A" * 43 + "="}),
+    # beacon-fold tampers (same four as verifier/conformance_check.mjs): entry_hash commits
+    # server_beacon, so each must be rejected. Not applicable to a bundle with no bound entry —
+    # the no-change guard in test_corpus skips those.
+    "beacon_round": lambda b: next((e["server_beacon"].__setitem__("round", e["server_beacon"]["round"] + 1) for e in b["entries"] if e.get("server_beacon")), None),
+    "beacon_randomness": lambda b: next((e["server_beacon"].__setitem__("randomness", "0" * 64) for e in b["entries"] if e.get("server_beacon")), None),
+    "beacon_drop": lambda b: next((e.pop("server_beacon") for e in b["entries"] if e.get("server_beacon")), None),
+    "beacon_inject": lambda b: next((e.__setitem__("server_beacon", {"chain": "drand:quicknet", "round": 1, "randomness": "0" * 64}) for e in b["entries"] if not e.get("server_beacon")), None),
 }
 
 
