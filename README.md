@@ -47,6 +47,16 @@ for e in result["entries"]:
 
 ### Grade a receipt's columns by k
 
+The CLI grades them too: point it at a `/columns/<recorder>/<seq>` receipt (or any document carrying a
+`columns` block) and it prints one line per column — `DERIVABLE k=0` recomputed, `WITNESSED k=N`
+co-signed by N−1 distinct-control witnesses, `TESTIMONY k=1` shown but not counted — plus whether
+`columns_sha256` binds the set. Exit 0 coherent, 1 if any column fails or the digest does not bind. A
+disclosure whose entries reveal a `columns` payload gets the same readout folded into its verdict.
+
+```
+touchstone-verify https://touchstone.cv/columns/<recorder>/<seq>
+```
+
 ```python
 from touchstone_verify import grade_columns, find_columns
 import json, urllib.request
