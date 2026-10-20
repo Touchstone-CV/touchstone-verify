@@ -46,6 +46,17 @@ def test_entry_hash():
     check(got == expected, "beacon appends exactly one canonical line")
     check(got != legacy, "a beacon-bound entry_hash differs from its unbound self")
 
+    # The state a truthiness gate (`if b:`) merges into "absent": present but FALSY. Key-presence gating
+    # returns the sentinel, never the legacy hash. {absent, well-formed, dict-missing-a-key} cannot tell
+    # the two gates apart: the first two agree, and a dict missing a key is truthy, so both reject it.
+    # (dantic 383e8cfa and hughey 8175161a on Colony post 1b3e6cde, 2026-10-20.)
+    for falsy in ({}, [], "", 0, False):
+        r = _entry_hash({**E, "server_beacon": falsy})
+        check(r == "malformed-server_beacon" and r != legacy,
+              f"present-but-falsy beacon {falsy!r} -> sentinel, not the legacy hash")
+    check(_entry_hash({**E, "server_beacon": {"chain": "drand:quicknet", "round": 1}}) == "malformed-server_beacon",
+          "dict missing a key -> sentinel (truthy-malformed; does not discriminate the gate on its own)")
+
 
 # --- 2. grade_columns k-model ------------------------------------------------------------------
 def test_grade_columns():
