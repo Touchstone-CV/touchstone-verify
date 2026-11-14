@@ -1,0 +1,73 @@
+{
+    "note": "The conformance corpus is exported without a server key, so no fixture alone exercises a checkpoint signature. Each harness signs every valid fixture of conformance/manifest.json (the root of each checkpoint, and the head for a confirmed self anchor) with a key derived from seed = SHA-256(name), and runs the cases below with and without an expected server key. Ed25519 is deterministic, so every harness checks the same bytes; each asserts that its derived public keys equal the two given here. This file sits beside the conformance directory, not in it: that directory must stay byte-identical to the copy in Touchstone-CV/touchstone-verify (verifier/fixture_parity.py), and the Python package does not take an expected key yet.",
+    "seed_names": [
+        "touchstone-conformance-server-key-7",
+        "touchstone-conformance-server-key-12"
+    ],
+    "pubkeys": [
+        "gHUqUN335q+zo0CIEXl/7n1W7PkFL+XqAwNnCATmf0M=",
+        "dMDz9Hv6UCNh4LuHnYTD+kMJ/0ispSVwiMvxmf6cdpY="
+    ],
+    "signatures_note": "What each key's signatures over each valid fixture are: recorder_sig is over the checkpoint's merkle_root, self_anchor over its head_hash, both as UTF-8 text. A harness that can sign asserts that it produces exactly these; one that cannot sign (the dependency-free Python verifier) applies them.",
+    "signatures": {
+        "plain_valid.json": {
+            "key_1": [
+                {
+                    "checkpoint_id": 75,
+                    "recorder_sig": "p4UuiW9D6GceFLH8/7qmd36/BdWxwvHDVhdyo1BXgEPhccZTMdKdySVzpBv+e6lRg77J1L0eDeFKzhJkNR9/DA==",
+                    "self_anchor": "44GwfZrrOqzwidsKnYlrXzTsAAcwyvGZz8Ordx4aw3MDs9McQLq3WkzlcCBlIiEuM9pNhUIJ7GGc49weomvRDQ=="
+                }
+            ],
+            "key_2": [
+                {
+                    "checkpoint_id": 75,
+                    "recorder_sig": "H9p3ioijZtaAplHxYq/PfZefGn2IYUbGCPvb8Erc2dTKwRtOGSnBw0EtNAPguPoJukVxfM+reN+FFwqEQPhrAw==",
+                    "self_anchor": "PJf+K4kvbN/oBLY8JiutHt5aj2ocGvqsg430rrW9xKXzhJLikHI3jCwiU1N/OYasl6z8hTCNFmf4708swkd0DA=="
+                }
+            ]
+        },
+        "sd_valid.json": {
+            "key_1": [
+                {
+                    "checkpoint_id": 76,
+                    "recorder_sig": "rc3hIc14HXKei8Zp21x3+qZ7RxOtWirnnf7NzP29uGMJQrXq1bQkWdA3SMvwQ0I9vSwKNSc4PpR+XVOhhKrGAQ==",
+                    "self_anchor": "ifUkZYb/XVL8XBLaUd2zCPx14iRRZ7LmiTXZUHD3dHxsEKHUB+6pxT7BMRkNp3UmFoqrFtt5LMhvByWWTjUlCg=="
+                }
+            ],
+            "key_2": [
+                {
+                    "checkpoint_id": 76,
+                    "recorder_sig": "PcZOekRaFOjTPBMASJTeUJOh0ZVBO71okOfzl/8kb9VtkH0t41RU/nxq9+5ftHV8owkxOI/Po+HWQjGHEudaBA==",
+                    "self_anchor": "xD2qRIqEZMde6iCIFZ04I+/e6oEH5nd7MXeN0j43ZCsfatHWWzy6ysnk9BzNi95d4HZitpy8sVsXyYDAql+vDw=="
+                }
+            ]
+        },
+        "beacon_valid.json": {
+            "key_1": [
+                {
+                    "checkpoint_id": 77,
+                    "recorder_sig": "nqIM607ilIi74nWEaFD9XMoq4IHB/UNx6qqFc1zdD5uR4G7sDv02K2/+Mm7w4Xr7z97mt3aRo/sNUKjmpb1MBw==",
+                    "self_anchor": "IN1csqNnpC3X/Pjcf6NYY6rTW2OOqxqDYmOCaM5DO9LNXXYg0REwEb6p1SSFeF4moJPc7zuUrDhCAZvwr9NgBQ=="
+                }
+            ],
+            "key_2": [
+                {
+                    "checkpoint_id": 77,
+                    "recorder_sig": "jPV6SGN1AYaY4kmu2YGuvZXXwqN7MtB4+XupDqzPBbarsK1iM5+9V7sANVLLAlPW16B+sCju7rwET6MOWy8NAg==",
+                    "self_anchor": "p2ztBeth8g3hpRG+ZEqSxt9Qz6HfYybJwPMfo4J+Lu6jVMlkGk8tCU1tYaPDssgMz0wOhfodvQLW44BaVk+sCA=="
+                }
+            ]
+        }
+    },
+    "cases": {
+        "signed_no_expectation": "signed by key 1, no expected key: ok, and a note says the key was taken from the bundle",
+        "expected_match": "signed by key 1, expected key 1: ok, state 'expected'",
+        "expected_urlsafe": "signed by key 1, expected key 1 written in the URL-safe alphabet: ok (keys are compared as bytes)",
+        "expected_other": "signed by key 1, expected key 2: rejected",
+        "resigned_by_another_key": "the same checkpoints signed by key 2 instead: ok with no expected key (the limit), rejected when key 1 is expected",
+        "stripped": "the fixture as exported, no server key: ok with no expected key (the limit), rejected when key 1 is expected",
+        "bad_root_signature": "signed by key 1 but one checkpoint's root signature is key 2's: rejected with or without an expected key",
+        "bad_self_anchor": "signed by key 1 but the self anchor is key 2's: rejected with or without an expected key",
+        "malformed_expected": "signed by key 1, expected key empty, too short, unpadded, or with a trailing newline: rejected each time"
+    }
+}

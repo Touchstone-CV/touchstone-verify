@@ -71,8 +71,24 @@ def main(argv=None) -> int:
         i = argv.index("--base")
         base = argv[i + 1].rstrip("/")
         del argv[i:i + 2]
+    # --server-key <base64> (or --server-key=<base64>): the server key obtained somewhere that is not the
+    # bundle. With it, a bundle that carries another key, or none, is rejected. An empty value is a given
+    # key that is malformed, not an absent one.
+    expected_key = None
+    for i, a in enumerate(list(argv)):
+        if a.startswith("--server-key="):
+            expected_key = a[len("--server-key="):]
+            del argv[i]
+            break
+        if a == "--server-key":
+            if i + 1 >= len(argv):
+                print("--server-key needs a value", file=sys.stderr)
+                return 2
+            expected_key = argv[i + 1]
+            del argv[i:i + 2]
+            break
     if not argv:
-        print("usage: python -m touchstone_verify <file|url|token> [--base URL]", file=sys.stderr)
+        print("usage: python -m touchstone_verify <file|url|token> [--base URL] [--server-key BASE64]", file=sys.stderr)
         return 2
 
     try:
@@ -81,7 +97,7 @@ def main(argv=None) -> int:
         print(f"could not load: {e}", file=sys.stderr)
         return 2
 
-    res = verify_disclosure(bundle)
+    res = verify_disclosure(bundle, expected_key)
     if not res.get("format_ok"):
         # Not a disclosure — but a columns receipt (/columns/<recorder>/<seq>, or any document carrying
         # a `columns` block) is still gradable on its own. The anchor walk is the receipt's `anchor`
@@ -121,6 +137,10 @@ def main(argv=None) -> int:
     if res["ok"] and cols_ok is not False:
         print(f"{GREEN}PASS{RST} — integrity, attribution and ordering hold (not completeness)"
               + ("; columns coherent." if cols_ok else "."))
+        if (res.get("server_key") or {}).get("state") != "expected":
+            print(f"{DIM}The server key was taken from the bundle itself, so this does not show the checkpoints are\n"
+                  f"Touchstone's. Pass --server-key <key> with a key obtained elsewhere (the recorder's public feed\n"
+                  f"states it) to require that.{RST}")
         return 0
     print(f"{RED}FAIL{RST} — " + ("a column fails or the set digest does not bind." if res["ok"] else "a load-bearing check did not hold."))
     return 1
