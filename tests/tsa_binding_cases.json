@@ -1,0 +1,34 @@
+{
+  "note": "Issue 23: a carried RFC 3161 response must commit to the checkpoint head it is attached to. Every verifier (public/verifier.js, verifier/verify.php, the Python package) runs these cases and must agree on each. The two bundles are existing public files, copied byte for byte; nothing was built or signed for this change (see tsa_binding/README.md). The vectors are made by each harness from ONE anchor, the timestamp anchor of the bundle as served, by the edits named below: they are inputs to the binding function only, not bundles.",
+  "bundles": [
+    {
+      "file": "tsa_binding/B10_as_served.json",
+      "sha256": "7de556fd5511bd1fdc0ad89454805c42aa0e8a19a851dc5ca1027156470a6dcc",
+      "what": "control C1 of the public planted-defect exchange: the full disclosure exactly as the server served it",
+      "expect_ok": true,
+      "a_checkpoint_line_says": "message imprint equals this head"
+    },
+    {
+      "file": "tsa_binding/B01_planted_response_of_another_head.json",
+      "sha256": "4e417ce6570e41a12aab5d961e9ea8fc8bf56c0832891f10894bbae93e3e970b",
+      "what": "PLANTED, defect D7 of the same exchange: the whole bundle minted again under two other keys, with the genuine timestamp response left in place. Its head differs from the head the response commits to.",
+      "expect_ok": false,
+      "a_checkpoint_line_says": "does not bind checkpoint"
+    }
+  ],
+  "edits": "head: 'other' puts other_head in place of the checkpoint head; 'set:X' puts the string X. digest: 'other' sets the anchor's digest field to other_head; 'absent' removes the field. response: 'truncate:N' keeps the first N bytes of the decoded response; 'append:HH' adds the bytes HH (hex) after it; 'set:X' puts the string X as response_b64; 'absent' removes the field. A missing key leaves that part as served.",
+  "other_head": "640c22c9f2e441c0c46190907ebfcc33a2bbaca8e95fe362364bb5ddbb2444f8",
+  "vectors": [
+    {"name": "as_served", "expect": "bound", "says": "message imprint equals this head"},
+    {"name": "response_of_another_head", "head": "other", "digest": "other", "expect": "fail", "says": "message imprint is for another value"},
+    {"name": "digest_field_differs", "digest": "other", "expect": "fail", "says": "digest field differs"},
+    {"name": "digest_field_absent", "digest": "absent", "expect": "bound", "says": "message imprint equals this head"},
+    {"name": "response_truncated", "response": "truncate:200", "expect": "fail", "says": "unreadable"},
+    {"name": "response_with_a_trailing_byte", "response": "append:00", "expect": "fail", "says": "unreadable"},
+    {"name": "response_not_der", "response": "set:AAAA", "expect": "fail", "says": "unreadable"},
+    {"name": "response_not_base64", "response": "set:!!!!", "expect": "fail", "says": "not base64"},
+    {"name": "response_absent", "response": "absent", "expect": "unbound", "says": "no timestamp response is carried"},
+    {"name": "response_empty", "response": "set:", "expect": "unbound", "says": "no timestamp response is carried"},
+    {"name": "head_not_a_hash", "head": "set:not-a-hash", "expect": "fail", "says": "not a SHA-256 hex string"}
+  ]
+}

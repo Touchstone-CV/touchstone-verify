@@ -100,6 +100,122 @@ def _key32(x):
     return d if len(d) == 32 else None
 
 
+# ── RFC 3161: what the carried timestamp response commits to ─────────────────────────────
+# A disclosure carries, per checkpoint, the timestamp authority's response. Its TSTInfo holds a
+# message imprint: the value the authority stamped. Until this check no verifier read it, so a
+# bundle whose head was changed, with the old response left in place, still passed. This is the
+# same fixed walk as verify.php and verifier.js (TimeStampResp → timeStampToken → SignedData →
+# encapContentInfo → TSTInfo → messageImprint), definite lengths only. It READS the imprint. It
+# checks no signature and no certificate: that the authority really signed the response stays
+# the reader's job (openssl ts -verify … -CAfile). tests/tsa_binding_cases.json holds the cases
+# the three verifiers must agree on.
+def _der_tlv(b: bytes, pos: int, end: int):
+    if pos + 2 > end:
+        return None
+    tag, ln, p = b[pos], b[pos + 1], pos + 2
+    if ln & 0x80:
+        n = ln & 0x7F
+        if n == 0 or n > 4 or p + n > end:      # no indefinite length, nothing absurd
+            return None
+        ln = int.from_bytes(b[p:p + n], "big")
+        p += n
+    if p + ln > end:
+        return None
+    return (tag, p, p + ln)
+
+
+def _der_children(b: bytes, node):
+    out, p = [], node[1]
+    while p < node[2]:
+        c = _der_tlv(b, p, node[2])
+        if c is None:
+            return None
+        out.append(c)
+        p = c[2]
+    return out
+
+
+def tsa_imprint(der: bytes):
+    """{algorithm_oid_hex, hashed_hex} read from a DER TimeStampResp, or None when it cannot be read."""
+    if not isinstance(der, (bytes, bytearray)):
+        return None
+    der = bytes(der)
+    hx = lambda n: der[n[1]:n[2]].hex()  # noqa: E731
+    resp = _der_tlv(der, 0, len(der))
+    if resp is None or resp[0] != 0x30 or resp[2] != len(der):          # one SEQUENCE, nothing after it
+        return None
+    r = _der_children(der, resp)
+    if r is None or len(r) != 2 or r[0][0] != 0x30 or r[1][0] != 0x30:  # status, timeStampToken
+        return None
+    ci = _der_children(der, r[1])
+    if ci is None or len(ci) != 2 or ci[0][0] != 0x06 or hx(ci[0]) != "2a864886f70d010702" or ci[1][0] != 0xA0:
+        return None
+    c0 = _der_children(der, ci[1])
+    if c0 is None or len(c0) != 1 or c0[0][0] != 0x30:
+        return None
+    sd = _der_children(der, c0[0])
+    if sd is None or len(sd) < 3 or sd[0][0] != 0x02 or sd[1][0] != 0x31 or sd[2][0] != 0x30:
+        return None
+    enc = _der_children(der, sd[2])
+    if enc is None or len(enc) != 2 or enc[0][0] != 0x06 or hx(enc[0]) != "2a864886f70d0109100104" or enc[1][0] != 0xA0:
+        return None
+    e0 = _der_children(der, enc[1])
+    if e0 is None or len(e0) != 1 or e0[0][0] != 0x04:
+        return None
+    tst = _der_tlv(der, e0[0][1], e0[0][2])
+    if tst is None or tst[0] != 0x30 or tst[2] != e0[0][2]:
+        return None
+    ti = _der_children(der, tst)
+    if ti is None or len(ti) < 3 or ti[0][0] != 0x02 or ti[1][0] != 0x06 or ti[2][0] != 0x30:
+        return None
+    mi = _der_children(der, ti[2])
+    if mi is None or len(mi) != 2 or mi[0][0] != 0x30 or mi[1][0] != 0x04:
+        return None
+    alg = _der_children(der, mi[0])
+    if alg is None or len(alg) < 1 or alg[0][0] != 0x06:
+        return None
+    return {"algorithm_oid_hex": hx(alg[0]), "hashed_hex": hx(mi[1])}
+
+
+def tsa_binding(blob, head_hash) -> dict:
+    """Does the anchor's carried response commit to this head? state is 'bound' (its message imprint
+    is this head), 'fail' (it is carried and is not, or cannot be read, or the digest field
+    disagrees), or 'unbound' (no response is carried, so there is nothing to read)."""
+    import base64
+    import re
+    if not isinstance(blob, dict):
+        blob = {}
+    head = head_hash.lower() if isinstance(head_hash, str) else ""
+    if not re.fullmatch(r"[0-9a-f]{64}", head):
+        return {"state": "fail", "reason": "the checkpoint head is not a SHA-256 hex string"}
+    dg = blob.get("digest")
+    if dg is not None and (not isinstance(dg, str) or dg.lower() != head):
+        return {"state": "fail", "reason": "the anchor's digest field differs from the checkpoint head"}
+    r = blob.get("response_b64")
+    if r is None or r == "":
+        return {"state": "unbound", "reason": "no timestamp response is carried"}
+    if not isinstance(r, str) or len(r) % 4 != 0 or not re.fullmatch(r"[A-Za-z0-9+/]*={0,2}", r):
+        return {"state": "fail", "reason": "the timestamp response is unreadable (not base64)"}
+    try:
+        der = base64.b64decode(r, validate=True)
+    except Exception:
+        return {"state": "fail", "reason": "the timestamp response is unreadable (not base64)"}
+    imp = tsa_imprint(der)
+    if imp is None:
+        return {"state": "fail", "reason": "the timestamp response is unreadable (no message imprint found)"}
+    if imp["hashed_hex"] != head:
+        return {"state": "fail", "reason": f"the response's message imprint is for another value ({imp['hashed_hex'][:16]}…), not this head"}
+    return {"state": "bound", "reason": "the response's message imprint equals this head", "algorithm_oid_hex": imp["algorithm_oid_hex"]}
+
+
+def _tsa_host(blob) -> str:
+    try:
+        from urllib.parse import urlparse
+        return urlparse(blob.get("tsa")).hostname or "TSA"
+    except Exception:
+        return "TSA"
+
+
 def verify_disclosure(b: dict, expected_server_pubkey=None) -> dict:
     """Verify a decoded touchstone-disclosure/1 bundle. Returns
     {ok, format_ok, recorder, subject, tier, entries:[{seq,type,checks:[{ok,fatal,msg}]}],
@@ -235,6 +351,25 @@ def verify_disclosure(b: dict, expected_server_pubkey=None) -> dict:
                 msg = f"touchstone-cp-witness:v1:{recorder_id}:{cp['id']}:{cp['merkle_root']}:{cp['head_hash']}"
                 cp_add(_ed(w["witness_pubkey"], msg, w["witness_sig"]),
                        f"checkpoint #{cp['id']} witnessed by {w['witness_sub']} ({w['grade']})", True)
+            # RFC 3161: a carried response must commit to THIS head. Fails the checkpoint, not a note.
+            for a in (cp["anchors"] if isinstance(cp.get("anchors"), list) else []):
+                if not isinstance(a, dict) or a.get("method") != "tsa" or a.get("status") != "confirmed":
+                    continue
+                try:
+                    blob = json.loads(a.get("token_blob") or "{}")
+                except Exception:
+                    blob = {}
+                if not isinstance(blob, dict):
+                    blob = {}
+                tb = tsa_binding(blob, cp.get("head_hash"))
+                if tb["state"] == "fail":
+                    cp_add(False, f"RFC 3161 timestamp does not bind checkpoint #{cp['id']}: {tb['reason']}", True)
+                elif tb["state"] == "bound":
+                    cp_add(True, f"checkpoint #{cp['id']}: the carried RFC 3161 response's message imprint equals this head "
+                                 f"({_tsa_host(blob)}); the authority's signature and certificate chain are not checked here — openssl ts -verify", False)
+                else:
+                    cp_add(True, f"checkpoint #{cp['id']}: an RFC 3161 timestamp is claimed ({_tsa_host(blob)}) but no response is carried, "
+                                 f"so nothing here binds it to this head", False)
         except Exception:
             cp_add(False, "malformed checkpoint — rejected", True)
         prev_cp = cp
@@ -347,8 +482,18 @@ def verify_disclosure(b: dict, expected_server_pubkey=None) -> dict:
                     elif a.get("method") == "ots":
                         add(True, "OTS submitted, Bitcoin-pending (re-check with ots upgrade/verify)", False)
                     elif a.get("method") == "tsa" and a.get("status") == "confirmed":
-                        add(True, f"RFC 3161 timestamp ({a.get('external_ts')}); cryptographic check: openssl ts -verify", False)
-                        any_confirmed = True
+                        if not isinstance(blob, dict):
+                            blob = {}
+                        tb = tsa_binding(blob, cp.get("head_hash"))
+                        if tb["state"] == "fail":
+                            add(False, f"RFC 3161 timestamp does not bind checkpoint #{cp['id']}: {tb['reason']}", True)
+                        elif tb["state"] == "bound":
+                            add(True, f"RFC 3161 timestamp ({_tsa_host(blob)}, {a.get('external_ts')}); the response commits to this head; "
+                                      f"verify the authority: openssl ts -verify", False)
+                            any_confirmed = True
+                        else:
+                            add(False, f"RFC 3161 timestamp claimed ({_tsa_host(blob)}, {a.get('external_ts')}) but no response is carried; "
+                                       f"not counted as an anchor", False)
                 if not any_confirmed:
                     add(False, "no confirmed external anchor yet", False)
             else:

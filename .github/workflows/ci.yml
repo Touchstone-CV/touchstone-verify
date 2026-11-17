@@ -15,5 +15,7 @@ jobs:
         run: python tests/test_columns_and_beacon.py
       - name: Expected server key (the shared cases, with the published signatures)
         run: python tests/test_server_key.py
+      - name: Timestamp response binds the head (the shared cases, two public bundles)
+        run: python tests/test_tsa_binding.py
       - name: Build sdist + wheel
         run: pip install build && python -m build
