@@ -42,12 +42,20 @@ def _b64(s: str) -> bytes:
     return base64.b64decode(s.replace("-", "+").replace("_", "/") + "===")
 
 
+def _unhex(h) -> bytes:
+    # bytes.fromhex skips spaces, so "ab cd" and "abcd" were one hash here and two to verify.php and
+    # verifier.js, which refuse anything but hex digits. Refuse it here as well.
+    if not isinstance(h, str) or len(h) % 2 or any(c not in "0123456789abcdefABCDEF" for c in h):
+        raise ValueError("not hex")
+    return bytes.fromhex(h)
+
+
 def _mleaf(hex_h: str) -> str:
-    return _sha256_hex(b"\x00" + bytes.fromhex(hex_h))
+    return _sha256_hex(b"\x00" + _unhex(hex_h))
 
 
 def _mnode(l: str, r: str) -> str:
-    return _sha256_hex(b"\x01" + bytes.fromhex(l) + bytes.fromhex(r))
+    return _sha256_hex(b"\x01" + _unhex(l) + _unhex(r))
 
 
 def _merkle_from_proof(leaf_hex: str, proof):
@@ -136,7 +144,7 @@ def _der_children(b: bytes, node):
 
 
 def tsa_imprint(der: bytes):
-    """{algorithm_oid_hex, hashed_hex} read from a DER TimeStampResp, or None when it cannot be read."""
+    """{status, algorithm_oid_hex, hashed_hex} read from a DER TimeStampResp, or None when it cannot be read."""
     if not isinstance(der, (bytes, bytearray)):
         return None
     der = bytes(der)
@@ -146,6 +154,9 @@ def tsa_imprint(der: bytes):
         return None
     r = _der_children(der, resp)
     if r is None or len(r) != 2 or r[0][0] != 0x30 or r[1][0] != 0x30:  # status, timeStampToken
+        return None
+    st = _der_children(der, r[0])
+    if st is None or len(st) < 1 or st[0][0] != 0x02 or st[0][2] - st[0][1] != 1:   # PKIStatus: one INTEGER byte
         return None
     ci = _der_children(der, r[1])
     if ci is None or len(ci) != 2 or ci[0][0] != 0x06 or hx(ci[0]) != "2a864886f70d010702" or ci[1][0] != 0xA0:
@@ -174,7 +185,7 @@ def tsa_imprint(der: bytes):
     alg = _der_children(der, mi[0])
     if alg is None or len(alg) < 1 or alg[0][0] != 0x06:
         return None
-    return {"algorithm_oid_hex": hx(alg[0]), "hashed_hex": hx(mi[1])}
+    return {"status": der[st[0][1]], "algorithm_oid_hex": hx(alg[0]), "hashed_hex": hx(mi[1])}
 
 
 def tsa_binding(blob, head_hash) -> dict:
@@ -203,9 +214,39 @@ def tsa_binding(blob, head_hash) -> dict:
     imp = tsa_imprint(der)
     if imp is None:
         return {"state": "fail", "reason": "the timestamp response is unreadable (no message imprint found)"}
+    if imp["status"] > 1:
+        return {"state": "fail", "reason": f"the timestamp response's status is not granted (status {imp['status']})"}
+    if imp["algorithm_oid_hex"] != "608648016503040201":
+        return {"state": "fail", "reason": "the response's message imprint is not a SHA-256 imprint"}
     if imp["hashed_hex"] != head:
         return {"state": "fail", "reason": f"the response's message imprint is for another value ({imp['hashed_hex'][:16]}…), not this head"}
     return {"state": "bound", "reason": "the response's message imprint equals this head", "algorithm_oid_hex": imp["algorithm_oid_hex"]}
+
+
+def tsa_anchor_binding(anchor, head_hash) -> dict:
+    """One tsa anchor of a checkpoint: read its token, then ask tsa_binding. The token is a JSON object
+    in a string. Absent or empty: nothing is carried. Present and anything else: a failure. The three
+    verifiers read it by the same rule (a string, at most 64 opening brackets, no escaped surrogate,
+    an object at the top, no NaN or Infinity), so that no JSON dialect decides a verdict."""
+    import re
+    t = anchor.get("token_blob") if isinstance(anchor, dict) else None
+    blob = {}
+    if not (t is None or (isinstance(t, str) and t == "")):
+        bad = {"state": "fail", "reason": "the anchor's token is unreadable (not a JSON object in a string)", "host": "TSA"}
+        if not isinstance(t, str) or t.count("[") + t.count("{") > 64 or re.search(r"\\u[dD][89a-fA-F]", t):
+            return bad
+
+        def _refuse(_name):
+            raise ValueError("NaN and Infinity are not JSON")
+        try:   # numbers are never read from a token, so they are not converted: no size limit can decide the parse
+            blob = json.loads(t, parse_constant=_refuse, parse_int=lambda _s: 0, parse_float=lambda _s: 0.0)
+        except Exception:
+            return bad
+        if not isinstance(blob, dict):
+            return bad
+    out = tsa_binding(blob, head_hash)
+    out["host"] = _tsa_host(blob)
+    return out
 
 
 def _tsa_host(blob) -> str:
@@ -257,7 +298,15 @@ def verify_disclosure(b: dict, expected_server_pubkey=None) -> dict:
     # Index defensively: a mutated/hostile bundle can carry an unhashable seq/id (a list) — skip those
     # here (the per-entry field-type gate below rejects them) rather than raising, so verify_disclosure
     # always returns a verdict instead of throwing on malformed input (php/js return a clean reject).
-    cp_by_id = {cp.get("id"): cp for cp in checkpoints if isinstance(cp, dict) and isinstance(cp.get("id"), (int, str, type(None)))}
+    # Only an integer id indexes a checkpoint by its value. Any other id (an object, a list, true, a string,
+    # none) gets a name of its own, so that the type gate below rejects that checkpoint and no valid one can
+    # take its place in the index. Until 2026-11-18 a checkpoint whose id could not be a key was left out of
+    # the index, never looked at again, and the bundle passed without it.
+    cp_by_id = {}
+    for _i, _cp in enumerate(checkpoints):
+        _cid = _cp.get("id")
+        _plain = isinstance(_cid, int) and not isinstance(_cid, bool)
+        cp_by_id[_cid if _plain else ("malformed", _i)] = _cp
     by_seq = {e.get("seq"): e for e in entries if isinstance(e, dict) and isinstance(e.get("seq"), int)}
     state = {"ok": True}
     cp_checks = []
@@ -332,8 +381,30 @@ def verify_disclosure(b: dict, expected_server_pubkey=None) -> dict:
             if not (_is_int(cp.get("id")) and _is_int(cp.get("seq_start")) and _is_int(cp.get("seq_end"))
                     and isinstance(cp.get("merkle_root"), str) and isinstance(cp.get("head_hash"), str)):
                 cp_add(False, "malformed checkpoint field types — rejected", True)
-                prev_cp = cp
                 continue
+            # The head is, by the server's rule, the hash of the entry the checkpoint ends at: its last entry, or for
+            # a heartbeat, which adds none, the last entry before it (seq_end either way). No signature covers
+            # head and root together, so when that entry is in the bundle the two are compared here. The entry
+            # counts only when its own proof shows it is the last leaf under THIS root (no sibling on the right):
+            # an entry can be restated at another seq by anyone, so one found by its seq alone proves nothing.
+            # The entry lines further down hold seq_end to the same leaf. When the entry is not in the bundle,
+            # nothing here can do either, and the line says so.
+            last_e = by_seq.get(cp["seq_end"])
+            if isinstance(last_e, dict) and _is_int(last_e.get("seq")) and last_e["seq"] == cp["seq_end"]:
+                lp = last_e.get("merkle_proof")
+                if isinstance(lp, dict) and not lp:
+                    lp = []
+                last_leaf_here = (isinstance(lp, list) and not any(not isinstance(st, dict) or st.get("side") == "right" for st in lp)
+                                  and _merkle_from_proof(last_e.get("entry_hash"), lp) == cp["merkle_root"])
+                if not last_leaf_here:
+                    cp_add(False, f"checkpoint #{cp['id']}: the entry at seq {cp['seq_end']}, where it ends, is not shown to be the last leaf under its root", True)
+                else:
+                    cp_add(last_e["entry_hash"] == cp["head_hash"],
+                           f"checkpoint #{cp['id']} head is the hash of the entry it ends at (seq {cp['seq_end']})", True)
+            else:
+                cp_add(True, f"checkpoint #{cp['id']}: the entry it ends at (seq {cp['seq_end']}) is not in this disclosure, "
+                             f"so nothing here ties the head to an entry, and this checkpoint's anchors, which commit to the head, "
+                             f"are not shown to cover the entries below", False)
             if server_pub:
                 cp_add(_ed(server_pub, cp["merkle_root"], cp.get("recorder_sig", "")),
                        f"checkpoint #{cp['id']} root signed by "
@@ -355,20 +426,14 @@ def verify_disclosure(b: dict, expected_server_pubkey=None) -> dict:
             for a in (cp["anchors"] if isinstance(cp.get("anchors"), list) else []):
                 if not isinstance(a, dict) or a.get("method") != "tsa" or a.get("status") != "confirmed":
                     continue
-                try:
-                    blob = json.loads(a.get("token_blob") or "{}")
-                except Exception:
-                    blob = {}
-                if not isinstance(blob, dict):
-                    blob = {}
-                tb = tsa_binding(blob, cp.get("head_hash"))
+                tb = tsa_anchor_binding(a, cp.get("head_hash"))
                 if tb["state"] == "fail":
                     cp_add(False, f"RFC 3161 timestamp does not bind checkpoint #{cp['id']}: {tb['reason']}", True)
                 elif tb["state"] == "bound":
                     cp_add(True, f"checkpoint #{cp['id']}: the carried RFC 3161 response's message imprint equals this head "
-                                 f"({_tsa_host(blob)}); the authority's signature and certificate chain are not checked here — openssl ts -verify", False)
+                                 f"({tb['host']}); the authority's signature and certificate chain are not checked here — openssl ts -verify", False)
                 else:
-                    cp_add(True, f"checkpoint #{cp['id']}: an RFC 3161 timestamp is claimed ({_tsa_host(blob)}) but no response is carried, "
+                    cp_add(True, f"checkpoint #{cp['id']}: an RFC 3161 timestamp is claimed ({tb['host']}) but no response is carried, "
                                  f"so nothing here binds it to this head", False)
         except Exception:
             cp_add(False, "malformed checkpoint — rejected", True)
@@ -452,8 +517,20 @@ def verify_disclosure(b: dict, expected_server_pubkey=None) -> dict:
             _cid = e.get("checkpoint_id")
             if isinstance(mp, list) and isinstance(_cid, int) and not isinstance(_cid, bool) and cp_by_id.get(_cid):
                 cp = cp_by_id[e["checkpoint_id"]]
-                add(_merkle_from_proof(e["entry_hash"], mp) == cp["merkle_root"],
-                    f"merkle inclusion in checkpoint #{cp['id']}", True)
+                included = _merkle_from_proof(e["entry_hash"], mp) == cp["merkle_root"]
+                add(included, f"merkle inclusion in checkpoint #{cp['id']}", True)
+                # Where the entry stands in its checkpoint. Its seq must lie in the range the checkpoint states, and
+                # it is the entry the checkpoint ends at exactly when its proof has no sibling on the right: the tree
+                # promotes a lone node, so only the last leaf has none. Nobody signs seq_end. This is what holds it,
+                # and through it the head, to the signed root.
+                if included and _is_int(cp.get("seq_start")) and _is_int(cp.get("seq_end")):
+                    last_leaf = not any(isinstance(st, dict) and st.get("side") == "right" for st in mp)
+                    if e["seq"] < cp["seq_start"] or e["seq"] > cp["seq_end"]:
+                        add(False, f"seq {e['seq']} is outside checkpoint #{cp['id']}, which states seq {cp['seq_start']} to {cp['seq_end']}", True)
+                    elif last_leaf and e["seq"] != cp["seq_end"]:
+                        add(False, f"this entry is the last leaf under checkpoint #{cp['id']}'s root, and the checkpoint states that it ends at seq {cp['seq_end']}", True)
+                    elif not last_leaf and e["seq"] == cp["seq_end"]:
+                        add(False, f"checkpoint #{cp['id']} states that it ends at this entry, and the entry's proof shows a later leaf under the same root", True)
                 any_confirmed = False
                 for a in (cp.get("anchors") or []):
                     if not isinstance(a, dict):
@@ -482,17 +559,16 @@ def verify_disclosure(b: dict, expected_server_pubkey=None) -> dict:
                     elif a.get("method") == "ots":
                         add(True, "OTS submitted, Bitcoin-pending (re-check with ots upgrade/verify)", False)
                     elif a.get("method") == "tsa" and a.get("status") == "confirmed":
-                        if not isinstance(blob, dict):
-                            blob = {}
-                        tb = tsa_binding(blob, cp.get("head_hash"))
+                        tb = tsa_anchor_binding(a, cp.get("head_hash"))
                         if tb["state"] == "fail":
                             add(False, f"RFC 3161 timestamp does not bind checkpoint #{cp['id']}: {tb['reason']}", True)
                         elif tb["state"] == "bound":
-                            add(True, f"RFC 3161 timestamp ({_tsa_host(blob)}, {a.get('external_ts')}); the response commits to this head; "
-                                      f"verify the authority: openssl ts -verify", False)
+                            add(True, f"RFC 3161 timestamp: the carried response commits to this head. The authority's name ({tb['host']}) "
+                                      f"and the time ({a.get('external_ts')}) are this bundle's own statements, and the authority's signature "
+                                      f"is not checked here — openssl ts -verify", False)
                             any_confirmed = True
                         else:
-                            add(False, f"RFC 3161 timestamp claimed ({_tsa_host(blob)}, {a.get('external_ts')}) but no response is carried; "
+                            add(False, f"RFC 3161 timestamp claimed ({tb['host']}, {a.get('external_ts')}) but no response is carried; "
                                        f"not counted as an anchor", False)
                 if not any_confirmed:
                     add(False, "no confirmed external anchor yet", False)

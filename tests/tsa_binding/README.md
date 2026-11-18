@@ -15,6 +15,10 @@ no expected server key. Nora (Arcaeon) found that in the exchange.
 
 Nothing was built or signed for this change. No key is in this repository, and the script that made the exchange's planted files
 is not published. The vectors in `../tsa_binding_cases.json` are made by each test harness from the timestamp anchor of
-`B10_as_served.json` by small edits (another head string, a cut response); they are inputs to one function and are not bundles.
+`B10_as_served.json` by the small edits that file names: another head string, a cut response, one byte written over another at
+a stated position, a token that is not JSON. They are inputs to one function and are not bundles. The wiring cases edit the bundle
+as served in memory so that it must be REJECTED or must lose a claim (a response cut or removed, anchors taken away); none of them
+makes a bundle that claims more than the served one did. The two cases about a head that is not its last entry's hash use
+`../conformance/plain_valid.json`, a fixture made with test keys.
 
 If either file here ever differs from its SHA-256 above, the harnesses stop: they check the digest before using the file.

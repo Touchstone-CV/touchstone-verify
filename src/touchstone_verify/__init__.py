@@ -15,8 +15,8 @@ Verify is pure-Python and dependency-free; only minting (record) pulls PyNaCl, a
 """
 from .columns import evaluate_column, find_columns, grade_columns
 from .record import Recorder, Receipt, payload_hash
-from .verify import jcs, tsa_binding, verify_disclosure
+from .verify import jcs, tsa_anchor_binding, tsa_binding, verify_disclosure
 
-__all__ = ["verify_disclosure", "jcs", "tsa_binding", "grade_columns", "evaluate_column", "find_columns",
+__all__ = ["verify_disclosure", "jcs", "tsa_binding", "tsa_anchor_binding", "grade_columns", "evaluate_column", "find_columns",
            "Recorder", "Receipt", "payload_hash"]
 __version__ = "0.5.0"
