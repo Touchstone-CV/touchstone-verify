@@ -135,6 +135,29 @@ def test_cli_takes_the_expected_key():
         assert rc == 1 and "not a 32-byte Ed25519 key" in text, "an empty value is a malformed key, not an absent one"
         rc, text = run(path, "--server-key")
         assert rc == 2
+        # What a pass did NOT show, in the three cases a reader could misread (review of 2026-11-18).
+        # 1. No server key in the bundle and none expected: no checkpoint signature was checked at all.
+        bare = json.loads(json.dumps(signed)); bare.pop("server_pubkey")
+        for cp in bare["checkpoints"]:
+            cp.pop("recorder_sig", None)
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(bare, fh)
+        rc, text = run(path)
+        assert rc == 0 and "carries no server key" in text and "was taken from the bundle itself" not in text, "a bundle with no server key must not be described as carrying one"
+        # 2. The expected key matches, and the bundle holds no checkpoint: that key verified nothing.
+        nocp = json.loads(json.dumps(signed)); nocp["checkpoints"] = []
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(nocp, fh)
+        rc, text = run(path, "--server-key", k1)
+        assert rc == 0 and "holds no checkpoint" in text and "verified no signature here" in text, "an expected key that verified no signature must say so"
+        # 3. An expected key and an input that is not a disclosure: nothing can be held to the key, so it is not a pass.
+        cols = _load("fixtures", "columns_valid.json")
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(cols, fh)
+        rc, text = run(path)
+        assert rc == 0 and "COLUMNS COHERENT" in text, "without an expected key a columns receipt is still graded on its own"
+        rc, text = run(path, "--server-key", k1)
+        assert rc == 2 and "NOT A DISCLOSURE" in text and "nothing here can be checked against it" in text and "COLUMNS COHERENT" not in text, "with an expected key a non-disclosure must not exit 0"
     finally:
         os.unlink(path)
 
