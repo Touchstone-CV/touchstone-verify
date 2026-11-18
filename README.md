@@ -7,7 +7,9 @@ A disclosure is a tamper-evident slice of an agent's action log. This package re
 with no trust in Touchstone, that the slice is **intact** (entry hashes recompute), **attributed**
 (the subject's Ed25519 signature holds, epoch-aware across key rotation), and **ordered**
 (hash-chained, with checkpoints that are append-only, server-signed, and witness-co-signed). It
-also checks **selective-disclosure** field proofs and reports the external anchors. It proves
+also checks **selective-disclosure** field proofs and reports the external anchors. For an RFC 3161
+anchor it reads the carried response and fails the checkpoint when the response commits to another
+head; the authority's signature and certificate chain stay with `openssl ts -verify`. It proves
 tampering by anyone who is not Touchstone — it does **not** prove completeness, and says so.
 
 It agrees byte-for-byte with the other two Touchstone verifiers (`verify.php`, `verifier.js`):

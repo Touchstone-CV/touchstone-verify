@@ -1,0 +1,366 @@
+{
+  "note": "A carried RFC 3161 response must commit to the checkpoint head it is attached to, and the head must be the hash of the checkpoint's last entry (Touchstone issue 23). Every verifier (public/verifier.js, verifier/verify.php, the Python package) runs these cases and must agree on each. The two bundles are existing public files, copied byte for byte; nothing was built or signed for this file, and no key is used: every vector is an edit, named below, of the one timestamp anchor of the bundle as served.",
+  "bundles": [
+    {
+      "file": "tsa_binding/B10_as_served.json",
+      "sha256": "7de556fd5511bd1fdc0ad89454805c42aa0e8a19a851dc5ca1027156470a6dcc",
+      "what": "control C1 of the public planted-defect exchange: the full disclosure exactly as the server served it",
+      "expect_ok": true,
+      "a_checkpoint_line_says": "message imprint equals this head"
+    },
+    {
+      "file": "tsa_binding/B01_planted_response_of_another_head.json",
+      "sha256": "4e417ce6570e41a12aab5d961e9ea8fc8bf56c0832891f10894bbae93e3e970b",
+      "what": "PLANTED, defect D7 of the same exchange: the whole bundle minted again under two other keys, with the genuine timestamp response left in place. Its head differs from the head the response commits to.",
+      "expect_ok": false,
+      "a_checkpoint_line_says": "does not bind checkpoint"
+    }
+  ],
+  "edits": "head: 'other' puts other_head in place of the checkpoint head; 'set:X' puts the string X; 'upper' puts the head in capitals; 'newline' adds a line end after it. digest: 'other' sets the anchor's digest field to other_head; 'absent' removes the field. response is one edit or a list of edits applied in order to the decoded response: 'truncate:N' keeps the first N bytes; 'append:HH' adds the bytes HH (hex) after it; 'patch:P:HH' writes HH over the bytes at position P; 'splice:P:N:HH' takes N bytes out at position P and puts HH there; 'set:X' puts the string X in place of the base64 text; 'absent' removes the field. 'was' is what stands at the first edit's position before it (hex): a harness stops if it does not, so that an edit cannot land on the wrong field. token (anchor_vectors, given to the function that reads one anchor): 'absent' removes token_blob; 'value:J' puts the JSON value J in its place; 'cut:N' keeps its first N characters; 'wrap_in_list' puts it inside a one-element list; 'nest:N' puts an object whose one value is a list nested until the text holds N opening brackets; 'digits:N' puts an object whose one value is a number of N digits.",
+  "other_head": "640c22c9f2e441c0c46190907ebfcc33a2bbaca8e95fe362364bb5ddbb2444f8",
+  "vectors": [
+    {
+      "name": "as_served",
+      "expect": "bound",
+      "says": "message imprint equals this head"
+    },
+    {
+      "name": "response_of_another_head",
+      "head": "other",
+      "digest": "other",
+      "expect": "fail",
+      "says": "message imprint is for another value"
+    },
+    {
+      "name": "digest_field_differs",
+      "digest": "other",
+      "expect": "fail",
+      "says": "digest field differs"
+    },
+    {
+      "name": "digest_field_absent",
+      "digest": "absent",
+      "expect": "bound",
+      "says": "message imprint equals this head"
+    },
+    {
+      "name": "response_truncated",
+      "response": "truncate:200",
+      "expect": "fail",
+      "says": "unreadable"
+    },
+    {
+      "name": "response_with_a_trailing_byte",
+      "response": "append:00",
+      "expect": "fail",
+      "says": "unreadable"
+    },
+    {
+      "name": "response_not_der",
+      "response": "set:AAAA",
+      "expect": "fail",
+      "says": "unreadable"
+    },
+    {
+      "name": "response_not_base64",
+      "response": "set:!!!!",
+      "expect": "fail",
+      "says": "not base64"
+    },
+    {
+      "name": "response_absent",
+      "response": "absent",
+      "expect": "unbound",
+      "says": "no timestamp response is carried"
+    },
+    {
+      "name": "response_empty",
+      "response": "set:",
+      "expect": "unbound",
+      "says": "no timestamp response is carried"
+    },
+    {
+      "name": "head_not_a_hash",
+      "head": "set:not-a-hash",
+      "expect": "fail",
+      "says": "not a SHA-256 hex string"
+    },
+    {
+      "name": "status_rejection_with_a_token",
+      "response": "patch:8:02",
+      "was": "00",
+      "expect": "fail",
+      "says": "status is not granted"
+    },
+    {
+      "name": "status_granted_with_mods",
+      "response": "patch:8:01",
+      "was": "00",
+      "expect": "bound",
+      "says": "message imprint equals this head"
+    },
+    {
+      "name": "imprint_is_not_sha256",
+      "response": "patch:104:03",
+      "was": "01",
+      "expect": "fail",
+      "says": "not a SHA-256 imprint"
+    },
+    {
+      "name": "signed_data_oid_wrong",
+      "response": "patch:23:03",
+      "was": "02",
+      "expect": "fail",
+      "says": "unreadable"
+    },
+    {
+      "name": "tst_info_oid_wrong",
+      "response": "patch:68:05",
+      "was": "04",
+      "expect": "fail",
+      "says": "unreadable"
+    },
+    {
+      "name": "econtent_is_not_an_octet_string",
+      "response": "patch:73:24",
+      "was": "04",
+      "expect": "fail",
+      "says": "unreadable"
+    },
+    {
+      "name": "hashed_message_is_not_an_octet_string",
+      "response": "patch:107:05",
+      "was": "04",
+      "expect": "fail",
+      "says": "unreadable"
+    },
+    {
+      "name": "hashed_message_one_bit_off",
+      "response": "patch:109:fb",
+      "was": "fa",
+      "expect": "fail",
+      "says": "message imprint is for another value"
+    },
+    {
+      "name": "outer_length_not_minimal",
+      "response": "splice:1:3:8400001215",
+      "was": "821215",
+      "expect": "bound",
+      "says": "message imprint equals this head"
+    },
+    {
+      "name": "outer_length_in_five_bytes",
+      "response": "splice:1:3:850000001215",
+      "was": "821215",
+      "expect": "fail",
+      "says": "unreadable"
+    },
+    {
+      "name": "outer_length_indefinite",
+      "response": [
+        "splice:1:3:80",
+        "append:0000"
+      ],
+      "was": "821215",
+      "expect": "fail",
+      "says": "unreadable"
+    },
+    {
+      "name": "third_element_in_the_response",
+      "response": [
+        "patch:2:1217",
+        "append:0500"
+      ],
+      "was": "1215",
+      "expect": "fail",
+      "says": "unreadable"
+    },
+    {
+      "name": "inner_length_indefinite",
+      "response": "patch:106:80",
+      "was": "00",
+      "expect": "fail",
+      "says": "unreadable"
+    },
+    {
+      "name": "status_in_two_bytes",
+      "response": [
+        "splice:6:3:02020002",
+        "patch:5:04",
+        "patch:2:1216"
+      ],
+      "was": "020100",
+      "expect": "fail",
+      "says": "unreadable"
+    },
+    {
+      "name": "head_in_capitals",
+      "head": "upper",
+      "expect": "bound",
+      "says": "message imprint equals this head"
+    },
+    {
+      "name": "head_with_a_line_end",
+      "head": "newline",
+      "expect": "fail",
+      "says": "not a SHA-256 hex string"
+    }
+  ],
+  "anchor_vectors": [
+    {
+      "name": "token_as_served",
+      "expect": "bound",
+      "says": "message imprint equals this head"
+    },
+    {
+      "name": "token_absent",
+      "token": "absent",
+      "expect": "unbound",
+      "says": "no timestamp response is carried"
+    },
+    {
+      "name": "token_null",
+      "token": "value:null",
+      "expect": "unbound",
+      "says": "no timestamp response is carried"
+    },
+    {
+      "name": "token_empty_string",
+      "token": "value:\"\"",
+      "expect": "unbound",
+      "says": "no timestamp response is carried"
+    },
+    {
+      "name": "token_empty_object",
+      "token": "value:\"{}\"",
+      "expect": "unbound",
+      "says": "no timestamp response is carried"
+    },
+    {
+      "name": "token_not_json",
+      "token": "value:\"not json\"",
+      "expect": "fail",
+      "says": "token is unreadable"
+    },
+    {
+      "name": "token_cut_short",
+      "token": "cut:40",
+      "expect": "fail",
+      "says": "token is unreadable"
+    },
+    {
+      "name": "token_is_a_json_list",
+      "token": "value:\"[]\"",
+      "expect": "fail",
+      "says": "token is unreadable"
+    },
+    {
+      "name": "token_is_a_json_string",
+      "token": "value:\"\\\"x\\\"\"",
+      "expect": "fail",
+      "says": "token is unreadable"
+    },
+    {
+      "name": "token_is_json_null",
+      "token": "value:\"null\"",
+      "expect": "fail",
+      "says": "token is unreadable"
+    },
+    {
+      "name": "token_holds_nan",
+      "token": "value:\"{\\\"digest\\\":NaN}\"",
+      "expect": "fail",
+      "says": "token is unreadable"
+    },
+    {
+      "name": "token_holds_infinity",
+      "token": "value:\"{\\\"pki_status\\\":-Infinity}\"",
+      "expect": "fail",
+      "says": "token is unreadable"
+    },
+    {
+      "name": "token_holds_an_escaped_surrogate",
+      "token": "value:\"{\\\"tsa\\\":\\\"\\\\ud800\\\"}\"",
+      "expect": "fail",
+      "says": "token is unreadable"
+    },
+    {
+      "name": "token_holds_an_escaped_low_surrogate",
+      "token": "value:\"{\\\"tsa\\\":\\\"\\\\udc00\\\"}\"",
+      "expect": "fail",
+      "says": "token is unreadable"
+    },
+    {
+      "name": "token_holds_an_escaped_surrogate_in_capitals",
+      "token": "value:\"{\\\"tsa\\\":\\\"\\\\uDBFF\\\"}\"",
+      "expect": "fail",
+      "says": "token is unreadable"
+    },
+    {
+      "name": "token_with_a_key_that_starts_with_nul",
+      "token": "value:\"{\\\"\\\\u0000\\\":1}\"",
+      "expect": "unbound",
+      "says": "no timestamp response is carried"
+    },
+    {
+      "name": "token_is_a_number",
+      "token": "value:5",
+      "expect": "fail",
+      "says": "token is unreadable"
+    },
+    {
+      "name": "token_is_false",
+      "token": "value:false",
+      "expect": "fail",
+      "says": "token is unreadable"
+    },
+    {
+      "name": "token_is_an_object_not_a_string",
+      "token": "value:{\"response_b64\":\"\"}",
+      "expect": "fail",
+      "says": "token is unreadable"
+    },
+    {
+      "name": "token_is_a_list_holding_the_token",
+      "token": "wrap_in_list",
+      "expect": "fail",
+      "says": "token is unreadable"
+    },
+    {
+      "name": "token_with_64_opening_brackets",
+      "token": "nest:64",
+      "expect": "unbound",
+      "says": "no timestamp response is carried"
+    },
+    {
+      "name": "token_with_65_opening_brackets",
+      "token": "nest:65",
+      "expect": "fail",
+      "says": "token is unreadable"
+    },
+    {
+      "name": "token_with_a_5000_digit_number",
+      "token": "digits:5000",
+      "expect": "unbound",
+      "says": "no timestamp response is carried"
+    }
+  ],
+  "wiring": [
+    "response_cut",
+    "response_removed",
+    "token_unreadable",
+    "checkpoint_fails_alone",
+    "entry_reports_the_failure",
+    "unbound_is_not_an_anchor",
+    "anchors_not_a_list_are_not_read",
+    "head_is_not_the_last_entry_hash",
+    "last_entry_not_disclosed",
+    "heartbeat_repeats_the_head",
+    "an_entry_outside_the_stated_range",
+    "end_pointed_at_an_earlier_entry",
+    "end_pointed_past_the_last_entry",
+    "a_malformed_id_cannot_hide_behind_a_valid_one",
+    "the_end_entry_must_be_proven_under_the_root"
+  ],
+  "wiring_note": "The wiring cases are written out in each harness under exactly these names; a harness fails if the names it ran are not this list. Six of them edit the bundle as served (or read the planted one) and check that the result reaches the verdict and the lines; one of those holds the three verifiers to one reading of an anchors field that is not a list (it is not read). The other nine use a fixture made with test keys. A timestamp that does not bind, on a checkpoint that no entry cites, must fail the bundle through the checkpoint's own line. A head that is not its last entry's hash must be rejected; a bundle without the last entry must say that nothing ties the head to an entry; a heartbeat checkpoint (no new entry, the head of the one before it) must pass. Then the end of a checkpoint, which nobody signs: an entry outside the stated range, an end moved to an earlier entry, and an end moved past the last entry must each be rejected, because only the last leaf of the tree has a proof with no sibling on the right. The entry a checkpoint ends at counts only when its own proof puts it last under the checkpoint's root: an entry can be restated at another seq by anyone, so one found by its seq alone proves nothing. Last, a checkpoint with a malformed id must be rejected even when a valid one with the same text form follows it."
+}

@@ -27,6 +27,13 @@ TAMPERS = {
     "entry_hash": lambda b: _first_non_genesis(b).__setitem__("entry_hash", "f" * 64),
     "actor_sig": lambda b: _first_non_genesis(b).__setitem__("actor_sig", base64.b64encode(bytes([1] * 64)).decode()),
     "checkpoint_root": lambda b: b.get("checkpoints") and b["checkpoints"][0].__setitem__("merkle_root", "a" * 64),
+    # a head that is not the hash of the checkpoint's last entry: nothing else in a bundle without a server key reads it
+    "checkpoint_head": lambda b: b.get("checkpoints") and b["checkpoints"][0].__setitem__("head_hash", "b" * 64),
+    # an id that is an object: the three verifiers once disagreed here (rejected, a TypeError, and silently skipped)
+    "checkpoint_id_not_a_number": lambda b: b.get("checkpoints") and b["checkpoints"][0].__setitem__("id", {"n": 1}),
+    # a proof step whose hash holds spaces (two, so that its length stays even): bytes.fromhex skipped them, so this package folded what the other two refused
+    "proof_hash_with_a_space": lambda b: next((e["merkle_proof"][0].__setitem__("hash", e["merkle_proof"][0]["hash"][:2] + " " + e["merkle_proof"][0]["hash"][2:4] + " " + e["merkle_proof"][0]["hash"][4:])
+                                               for e in b["entries"] if e.get("merkle_proof")), None),
     "sd_revealed_value": lambda b: next(
         (f.__setitem__("v", "__TAMPERED__") for e in b["entries"] if e.get("sd") for f in e.get("sd_revealed", [])[:1]),
         None,
