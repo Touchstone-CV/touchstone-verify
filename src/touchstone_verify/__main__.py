@@ -71,8 +71,24 @@ def main(argv=None) -> int:
         i = argv.index("--base")
         base = argv[i + 1].rstrip("/")
         del argv[i:i + 2]
+    # --server-key <base64> (or --server-key=<base64>): the server key obtained somewhere that is not the
+    # bundle. With it, a bundle that carries another key, or none, is rejected. An empty value is a given
+    # key that is malformed, not an absent one.
+    expected_key = None
+    for i, a in enumerate(list(argv)):
+        if a.startswith("--server-key="):
+            expected_key = a[len("--server-key="):]
+            del argv[i]
+            break
+        if a == "--server-key":
+            if i + 1 >= len(argv):
+                print("--server-key needs a value", file=sys.stderr)
+                return 2
+            expected_key = argv[i + 1]
+            del argv[i:i + 2]
+            break
     if not argv:
-        print("usage: python -m touchstone_verify <file|url|token> [--base URL]", file=sys.stderr)
+        print("usage: python -m touchstone_verify <file|url|token> [--base URL] [--server-key BASE64]", file=sys.stderr)
         return 2
 
     try:
@@ -81,7 +97,12 @@ def main(argv=None) -> int:
         print(f"could not load: {e}", file=sys.stderr)
         return 2
 
-    res = verify_disclosure(bundle)
+    res = verify_disclosure(bundle, expected_key)
+    if not res.get("format_ok") and expected_key is not None:
+        # An expected key is a demand about a disclosure's checkpoints. This input has none to hold to it,
+        # so grading its columns and exiting 0 would read as "checked against that key".
+        print(f"{RED}NOT A DISCLOSURE{RST}: {res.get('error')} — --server-key was given, and nothing here can be checked against it")
+        return 2
     if not res.get("format_ok"):
         # Not a disclosure — but a columns receipt (/columns/<recorder>/<seq>, or any document carrying
         # a `columns` block) is still gradable on its own. The anchor walk is the receipt's `anchor`
@@ -96,7 +117,8 @@ def main(argv=None) -> int:
     print(f"recorder {res['recorder']}  subject {res.get('subject')}  tier {res.get('tier')}\n")
     for c in res.get("checkpoints", []):
         mark = GREEN + "✓" + RST if c["ok"] else (RED + "✗" + RST)
-        print(f"  [{mark}] {c['msg']}")
+        tail = "" if c.get("fatal") else f" {DIM}(info){RST}"
+        print(f"  [{mark}] {c['msg']}{tail}")
     for e in res["entries"]:
         print(f"  seq {e['seq']} ({e['type']}){' [redacted]' if e['redacted'] else ''}:")
         for c in e["checks"]:
@@ -121,6 +143,18 @@ def main(argv=None) -> int:
     if res["ok"] and cols_ok is not False:
         print(f"{GREEN}PASS{RST} — integrity, attribution and ordering hold (not completeness)"
               + ("; columns coherent." if cols_ok else "."))
+        key_state = (res.get("server_key") or {}).get("state")
+        root_signed = any(c["ok"] and c.get("fatal") and "root signed by" in c["msg"] for c in res.get("checkpoints", []))
+        if key_state == "absent":
+            print(f"{DIM}This bundle carries no server key, so no checkpoint signature was checked at all, and nothing\n"
+                  f"here shows the checkpoints are Touchstone's.{RST}")
+        elif key_state != "expected":
+            print(f"{DIM}The server key was taken from the bundle itself, so this does not show the checkpoints are\n"
+                  f"Touchstone's. Pass --server-key <key> with a key obtained elsewhere (the recorder's public feed\n"
+                  f"states it) to require that.{RST}")
+        elif not root_signed:
+            print(f"{DIM}The expected server key is the one this bundle carries, but the bundle holds no checkpoint, so\n"
+                  f"that key verified no signature here.{RST}")
         return 0
     print(f"{RED}FAIL{RST} — " + ("a column fails or the set digest does not bind." if res["ok"] else "a load-bearing check did not hold."))
     return 1

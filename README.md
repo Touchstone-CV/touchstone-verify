@@ -31,6 +31,19 @@ touchstone-verify 833cd4ca23fbb940dd71843ca47a807e        # fetches from touchst
 
 Exit code `0` = verified, `1` = a load-bearing check failed, `2` = couldn't load.
 
+**Whose server key?** A bundle carries the server key its checkpoint signatures verify under, so a
+bundle rebuilt from scratch under another key agrees with itself just as well, and a pass with the
+bundle alone shows only that. Give the verifier the key from somewhere that is not the bundle (the
+`server_pubkey` field of the recorder's public feed at
+`/.well-known/touchstone/checkpoints/<recorder>`, or a copy you saved earlier):
+
+```bash
+touchstone-verify ./bundle.json --server-key '<the key, base64>'
+```
+
+A bundle that carries another key, or none, is then rejected, and so is a malformed expected key.
+Without `--server-key` the verdict is as before and the output says the key came from the bundle.
+
 Library:
 
 ```python
@@ -38,8 +51,9 @@ from touchstone_verify import verify_disclosure
 import json, urllib.request
 
 bundle = json.load(urllib.request.urlopen("https://touchstone.cv/d/<token>"))
-result = verify_disclosure(bundle)
+result = verify_disclosure(bundle)                       # or verify_disclosure(bundle, expected_server_pubkey)
 print(result["ok"])           # True / False
+print(result["server_key"])   # {"state": "expected" | "mismatch" | "unconfirmed" | "absent", "pubkey": ...}
 for e in result["entries"]:
     for c in e["checks"]:
         print(c["ok"], c["msg"])
@@ -108,8 +122,9 @@ recorder whose every entry is inclusion-provable, provision it with `app:provisi
 - **Attribution** — the subject signature verifies over the canonical signed content; genesis
   proof-of-possession; `key_rotation` new-key PoP; counterparty co-signatures.
 - **Ordering** — `prev_hash` chain linkage; Merkle inclusion in the cited checkpoint.
-- **Checkpoints** — server signature over each Merkle root; append-only linkage between
-  consecutive checkpoints; independent witness co-signatures.
+- **Checkpoints** — signature over each Merkle root by the server key the bundle carries, which
+  is required to be the expected key when you give one; append-only linkage between consecutive
+  checkpoints; independent witness co-signatures.
 - **Selective disclosure** — each revealed field proves Merkle inclusion in `payload_hash`;
   withheld fields never appear in the bundle.
 

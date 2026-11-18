@@ -86,7 +86,21 @@ def _signed_content(recorder_id: str, e) -> str:
     })
 
 
-def verify_disclosure(b: dict) -> dict:
+def _key32(x):
+    """A 32-byte Ed25519 key written as 43 base64 characters and one '=', or None. One shape only,
+    checked before decoding, so that this verifier, verify.php and verifier.js cannot differ on a key
+    written with whitespace, without padding, or in the other base64 alphabet."""
+    import re
+    if not isinstance(x, str) or re.fullmatch(r"[A-Za-z0-9+/_-]{43}=", x) is None:
+        return None
+    try:
+        d = _b64(x)
+    except Exception:
+        return None
+    return d if len(d) == 32 else None
+
+
+def verify_disclosure(b: dict, expected_server_pubkey=None) -> dict:
     """Verify a decoded touchstone-disclosure/1 bundle. Returns
     {ok, format_ok, recorder, subject, tier, entries:[{seq,type,checks:[{ok,fatal,msg}]}],
     checkpoints:[{ok,fatal,msg}]}. `ok` is the AND of all fatal checks."""
@@ -137,6 +151,31 @@ def verify_disclosure(b: dict) -> dict:
         if fatal and not ok:
             state["ok"] = False
 
+    # Whose server key? The checkpoint signatures below verify under the key the BUNDLE carries. A
+    # bundle rebuilt under another key agrees with itself just as well, so "signed by the server key"
+    # means "signed by the key this bundle names" until that key is compared with one obtained
+    # elsewhere. With an expected key the comparison is made here, and a bundle that carries another
+    # key, or none, is rejected. Without one, the line says what was and was not shown. Compared as
+    # decoded bytes. Mirrors verify.php and verifier.js.
+    server_key_state = "absent"
+    if expected_server_pubkey is not None:
+        want, have = _key32(expected_server_pubkey), _key32(server_pub)
+        server_key_state = "mismatch"
+        if want is None:
+            cp_add(False, "the expected server key is not a 32-byte Ed25519 key — rejected", True)
+        elif server_pub is None:
+            cp_add(False, "a server key was expected and this bundle carries none — its checkpoints cannot be shown to be that server's", True)
+        elif have is None or have != want:
+            cp_add(False, "the server key in this bundle is NOT the expected one — its checkpoint signatures are by another key", True)
+        else:
+            cp_add(True, "the server key in this bundle is the expected one", True)
+            server_key_state = "expected"
+    elif server_pub is not None:
+        server_key_state = "unconfirmed"
+        cp_add(True, f"server key {server_pub} is taken from this bundle: the checkpoint signatures below are by THAT key, "
+                     "which this pass does not show to be Touchstone's — compare it with server_pubkey at "
+                     f"/.well-known/touchstone/checkpoints/{recorder_id}, or verify again with the expected key", False)
+
     # Key epochs must be introduced by their key_rotation entry when it's in the bundle,
     # else an attacker injects a forged epoch (see verify.php). Genesis is bound by the PoP.
     for ep in epochs:
@@ -160,6 +199,10 @@ def verify_disclosure(b: dict) -> dict:
     cp_add(True, f'attribution binds to the genesis key, which self-claims subject "{rec.get("subject_sub")}"; '
                  f'confirm that key at /.well-known/touchstone/pubkeys/{rec.get("subject_sub")} — this bundle alone '
                  "does not prove the subject→key binding", False)
+    # The tier label is the same kind of claim: nothing in the bundle binds it. Say so beside it.
+    if isinstance(rec.get("trust_tier"), str) and rec.get("trust_tier") != "":
+        cp_add(True, f'trust tier "{rec.get("trust_tier")}" is this bundle\'s own statement, bound by no hash or signature in it — '
+                     f"the recorder's public feed states it too (/.well-known/touchstone/checkpoints/{recorder_id}, field trust_tier)", False)
 
     prev_cp = None
 
@@ -177,7 +220,8 @@ def verify_disclosure(b: dict) -> dict:
                 continue
             if server_pub:
                 cp_add(_ed(server_pub, cp["merkle_root"], cp.get("recorder_sig", "")),
-                       f"checkpoint #{cp['id']} root signed by Touchstone server", True)
+                       f"checkpoint #{cp['id']} root signed by "
+                       + ("the expected server key" if server_key_state == "expected" else "the server key in this bundle"), True)
             else:
                 cp_add(True, f"checkpoint #{cp['id']} server signature unverifiable (no server_pubkey)", False)
             if prev_cp is not None:
@@ -346,5 +390,6 @@ def verify_disclosure(b: dict) -> dict:
     return {
         "ok": state["ok"], "format_ok": True, "recorder": recorder_id,
         "subject": rec.get("subject_sub"), "tier": rec.get("trust_tier"),
+        "server_key": {"state": server_key_state, "pubkey": server_pub},
         "entries": entries_out, "checkpoints": cp_checks,
     }
